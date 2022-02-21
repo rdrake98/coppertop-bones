@@ -496,7 +496,6 @@ def lexBonesSrc(src, symbols):
                             # set blank lines to have indent of 0 (thus forcing a new phrase)
                             tokens.append(Token(text, tag, 0, len(tokens), c1, c2, l1, l2))
                         else:
-                            print(l1, prettyNameByTag[tag], indent, c1, (c2 - lines[l1].c1))
                             tokens.append(Token(text, tag, indent, len(tokens), c1, c2, l1, l2))
                 if tag in (LINE_BREAK, CONTINUATION):
                     indent = 0

@@ -25,12 +25,12 @@ from bones.core.metatypes import BTAtom as _BTAtom
 
 
 # piping styles
+noun = _BTAtom.ensure("noun")
 nullary = _BTAtom.ensure("nullary")
 unary = _BTAtom.ensure("unary")
 binary = _BTAtom.ensure("binary")
 ternary = _BTAtom.ensure("ternary")
 rau = _BTAtom.ensure("rau")
-noun = _BTAtom.ensure("noun")
 
 
 # _BTAtom.define('imlist')        # immediate list, e.g. (1,2,3)

@@ -17,8 +17,8 @@
 # **********************************************************************************************************************
 
 from coppertop.std import check, equal
-from coppertop.range.std import rEach, rChain
-from coppertop.range import IndexableFR, ListOR, getIRIter, materialise
+from coppertop.std.range import rEach, rChain
+from coppertop.std.range import IndexableFR, ListOR, getIRIter, materialise
 
 
 def test_listRanges():
@@ -52,7 +52,7 @@ def test_take():
 def main():
     test_listRanges()
     test_rangeOrRanges()
-    test_other()
+    # test_other()
     # test_take()
 
 

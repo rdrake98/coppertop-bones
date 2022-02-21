@@ -1,6 +1,6 @@
 # **********************************************************************************************************************
 #
-#                             Copyright (c) 2019-2021 David Briant. All rights reserved.
+#                             Copyright (c) 2019-2022 David Briant. All rights reserved.
 #
 # This file is part of bones.
 #
@@ -29,11 +29,12 @@ from bones.lang.sym import SymTable
 
 
 # TODO
+# separate tokensInFlight and phrase as the conflation made the requires expression
 # add continuation across multiple groups on same line
 # add return types
 # add binary functions {{x+y}}
-# figure when to determine style of functions as needed as input for parser
-# add from x.y.z uses (or from use? no, from define?)
+# figure when to determine style of functions as needed as input for parser - should cast, i.e. |, be part of grouping?
+# add from x.y.z usedef add, fred
 # add syntax error tests
 # improve error descriptions
 
@@ -365,7 +366,6 @@ def test_group_bones_files():
         tokens, lines = lex.lexBonesSrc(src, SymTable())
         snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
         snippet.PPGroup >> PP
-
 
 
 

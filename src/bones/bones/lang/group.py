@@ -21,7 +21,7 @@
 #
 # determineGrouping
 #   inputs a stream of tokens
-#   outputs a SnippetTokens
+#   outputs a SnippetGroup
 # it consumes the tokens one by one injecting the token into the group at the top of a stack
 # new groups are created as openers are encountered
 # groups are _finalised (checked for errors) and popped off the stack as closers are encountered
@@ -65,7 +65,7 @@ from bones.lang.types import nullary, binary, rau, ternary, unary, noun
 
 def determineGrouping(tokens, extraCatchers=[]):
     stack = _Stack()
-    currentTG = stack.push(SnippetTokens(None, None))   # this one obviously doesn't need catching!!
+    currentTG = stack.push(SnippetGroup(None, None))   # this one obviously doesn't need catching!!
     openers = (L_PAREN, L_BRACKET, L_ANGLE_COLON, L_BRACE_BRACKET, L_BRACE_PAREN, L_BRACE, L_PAREN_BRACKET)
     openingCatchers = (catchLParen, catchLBracket, catchLAngleColon, catchLBraceBracket, catchLBraceParen, catchLBrace, catchLParenBracket)
     closers = (R_PAREN, R_BRACKET, R_ANGLE, R_BRACE)
@@ -82,7 +82,7 @@ def determineGrouping(tokens, extraCatchers=[]):
                     break
         # first give the current token group a chance to process or reject the token <<<<< not quite true
         if not caught:
-            normal = not(isOpener or isCloser) or (token.tag == R_ANGLE and not isinstance(currentTG, TypeDescTG))
+            normal = not(isOpener or isCloser) or (token.tag == R_ANGLE and not isinstance(currentTG, TypeLangGroup))
             if normal:
                 currentTG._consumeToken(token, token.indent)
                 caught = True
@@ -536,7 +536,7 @@ def _procesAssigmentsInPhrase(phrase):
             phrase = phrase[1:] + [toGlobalAssignRight(phrase[0])]
 
     elif len(phrase) >= 2:
-        if isinstance(phrase[0], TypeDescTG) and isinstance(phrase[1], Token):
+        if isinstance(phrase[0], TypeLangGroup) and isinstance(phrase[1], Token):
             if phrase[1].tag == ASSIGN_LEFT:
                 assert len(phrase) >= 3, "Syntax error"       # must do - nice error message
                 # move first two tokens to end
@@ -567,7 +567,7 @@ def _procesAssigmentsInPhrase(phrase):
 # snippet
 # **********************************************************************************************************************
 
-class SnippetTokens(_DotSeparated):
+class SnippetGroup(_DotSeparated):
     def _finalise(self):
         assert self._consuming
         # since a Snippet has no closing token we have to close when the main parsing loop calls _finalise
@@ -585,11 +585,11 @@ class SnippetTokens(_DotSeparated):
 
 def catchLBracket(token, currentTG, stack):
     if not (token.tag == L_BRACKET): return None
-    dl = DefListTokens(currentTG, token)
+    dl = DefListGroup(currentTG, token)
     currentTG._consumeToken(dl, token.indent)
     return stack.push(dl)
 
-class DefListTokens(_Grid):
+class DefListGroup(_Grid):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_BRACKET: return prettyNameByTag(R_BRACKET)
         self._finishPhrase(Missing, SECTION_END)
@@ -608,11 +608,11 @@ class DefListTokens(_Grid):
 
 def catchLParen(token, currentTG, stack):
     if not (token.tag == L_PAREN): return None
-    il = ImListTokens(currentTG, token)
+    il = ImListGroup(currentTG, token)
     currentTG._consumeToken(il, token.indent)
     return stack.push(il)
 
-class ImListTokens(_Grid):
+class ImListGroup(_Grid):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_PAREN: return prettyNameByTag(R_PAREN)
         self._finishPhrase(Missing, SECTION_END)
@@ -632,30 +632,30 @@ class ImListTokens(_Grid):
 
 def catchLBrace(token, currentTG, stack):
     if not (token.tag == L_BRACE): return None
-    f = FunctionTokens(currentTG, token)
+    f = FunctionGroup(currentTG, token)
     currentTG._consumeToken(f, token.indent)
     return stack.push(f)
 
 def catchLBraceBracket(token, currentTG, stack):
     if not (token.tag == L_BRACE_BRACKET): return None
-    f = FunctionTokens(currentTG, token)
+    f = FunctionGroup(currentTG, token)
     currentTG._consumeToken(f, token.indent)
     stack.push(f)
-    dp = DefParamsTokens(f, token)
+    dp = DefParamsGroup(f, token)
     f._params = dp
     return stack.push(dp)
 
 def catchLBraceParen(token, currentTG, stack):
     if not (token.tag == L_BRACE_PAREN): return None
-    f = FunctionTokens(currentTG, token)
+    f = FunctionGroup(currentTG, token)
     currentTG._consumeToken(f, token.indent)
     stack.push(f)
-    ip = ImParamsTokens(f, token)
+    ip = ImParamsGroup(f, token)
     f._params = ip
     return stack.push(ip)
 
 
-class FunctionTokens(_DotSeparated):
+class FunctionGroup(_DotSeparated):
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
         self._params = Missing
@@ -706,20 +706,20 @@ class _ParamsTokens(_CommaSeparated):
                 raise GroupingError(f'{{[... {firstToken.src} is missing type @{self.l1}:{self.c1}')
             elif firstToken.tag != NAME:
                 raise GroupingError(f'{{[... contains {firstToken.src} which is not a name @{self.l1}:{self.c1}')
-            phrase2 = [SingleParamTokens(self, firstToken, [])]
+            phrase2 = [ParamGroup(self, firstToken, [])]
         else:
             firstToken = phrase[0]
             if firstToken.tag == ASSIGN_LEFT:
                 # fred:num or fred: num
                 newNameToken = Token(firstToken.src, NAME, firstToken.indent, firstToken.n, firstToken.c1, firstToken.c2, firstToken.l1, firstToken.l2)
-                phrase2 = [SingleParamTokens(self, newNameToken, phrase[1:])]
+                phrase2 = [ParamGroup(self, newNameToken, phrase[1:])]
             elif firstToken.tag == NAME and (secondToken := phrase[1]).tag == ASSIGN_RIGHT:
                 # fred :num
                 firstTypeName = Token(secondToken.src, NAME, secondToken.indent, secondToken.n, secondToken.c1, secondToken.c2, secondToken.l1, secondToken.l2)
-                phrase2 = [SingleParamTokens(self, firstToken, [firstTypeName] + phrase[2:])]
+                phrase2 = [ParamGroup(self, firstToken, [firstTypeName] + phrase[2:])]
             elif len(phrase) >= 3 and firstToken.tag == NAME and phrase[1].tag == COLON and phrase[2].tag == NAME:
                 # fred : name
-                phrase2 = [SingleParamTokens(self, firstToken, phrase[2:])]
+                phrase2 = [ParamGroup(self, firstToken, phrase[2:])]
             else:
                 raise SyntaxError()
         self._commaList << _Phrase(phrase2)
@@ -748,7 +748,7 @@ class _ParamsTokens(_CommaSeparated):
         return self._commaList[-1][-1]
 
 
-class DefParamsTokens(_ParamsTokens):
+class DefParamsGroup(_ParamsTokens):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_BRACKET: return prettyNameByTag(R_BRACKET)
         super()._processCloserOrAnswerError(token)
@@ -758,7 +758,7 @@ class DefParamsTokens(_ParamsTokens):
         return f'[{", ".join(pps)}]'
 
 
-class ImParamsTokens(_ParamsTokens):
+class ImParamsGroup(_ParamsTokens):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_PAREN: return prettyNameByTag(R_PAREN)
         super()._processCloserOrAnswerError(token)
@@ -768,7 +768,7 @@ class ImParamsTokens(_ParamsTokens):
         return f'({", ".join(pps)})'
 
 
-class SingleParamTokens(_Tokens):
+class ParamGroup(_Tokens):
     def __init__(self, parent, nameToken, typeExpr):
         super().__init__(parent, nameToken)
         self._closer = typeExpr[-1] if typeExpr else nameToken  # handle no typeExpr
@@ -788,18 +788,18 @@ class SingleParamTokens(_Tokens):
 
 def catchLParenBracket(token, currentTG, stack):
     if not (token.tag == L_PAREN_BRACKET): return None
-    ttg = TableTokens(currentTG, token)
+    ttg = TableGroup(currentTG, token)
     currentTG._consumeToken(ttg, token.indent)
     stack.push(ttg)
-    tktg = TableKeys(ttg, token)
+    tktg = TableKeysGroup(ttg, token)
     return stack.push(tktg)
 
-class TableTokens(_CommaSeparated):
+class TableGroup(_CommaSeparated):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_PAREN: return prettyNameByTag(R_PAREN)
         self._finalise()
 
-class TableKeys(_CommaSeparated):
+class TableKeysGroup(_CommaSeparated):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_BRACKET: return prettyNameByTag(R_BRACKET)
         self._finalise()
@@ -812,11 +812,11 @@ class TableKeys(_CommaSeparated):
 
 def catchLAngleColon(token, currentTG, stack):
     if not (token.tag == L_ANGLE_COLON): return None
-    tttg = TypeDescTG(currentTG, token)
+    tttg = TypeLangGroup(currentTG, token)
     currentTG._consumeToken(tttg, token.indent)
     return stack.push(tttg)
 
-class TypeDescTG(_Tokens):
+class TypeLangGroup(_Tokens):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_ANGLE: return prettyNameByTag(R_ANGLE)
         self._moveTokensToExpr()
@@ -834,7 +834,7 @@ class TypeDescTG(_Tokens):
 def catchKeyword(token, currentTG, stack):
     if token.tag != NAME_COLON:
         return None
-    if len(currentTG._phrase) == 0 or isinstance(currentTG, SingleParamTokens):
+    if len(currentTG._phrase) == 0 or isinstance(currentTG, ParamGroup):
         # either there's nothing to the left so it can't be a keyword call, or we're parsing parameters for a function
         return None
     # if the potential keyword is on the same line then ok, or if it adds at least MIN_INDENT_FOR_KEYWORD to
@@ -842,7 +842,7 @@ def catchKeyword(token, currentTG, stack):
     indentOverFirstToken = token.indent - currentTG._phrase[0].indent
     if (currentTG._phrase[0].l2 != token.l2) and not (indentOverFirstToken >= MIN_INDENT_FOR_KEYWORD):
         return None
-    ketg = KeywordCatcher(currentTG, token)
+    ketg = _KeywordCatcher(currentTG, token)
     return stack.push(ketg)
 
 
@@ -857,7 +857,7 @@ def lastKv(d):
 def atIfNonePut(d, k, v):
     return d.setdefault(k, v)
 
-class KeywordCatcher(_CommaSeparated):
+class _KeywordCatcher(_CommaSeparated):
 
     def _consumeToken(self, tokenOrGroup, indent):
         assert self._consuming
@@ -973,7 +973,7 @@ class KeywordCatcher(_CommaSeparated):
         )
         self._tokensForParent.append(newNameToken)
 
-        argsImList = ImListTokens(self.parent, self._opener)
+        argsImList = ImListGroup(self.parent, self._opener)
 
         exprs1D = _Row()
         for expr in self._commaList:
@@ -1013,11 +1013,11 @@ class KeywordCatcher(_CommaSeparated):
 def catchRequires(token, currentTG, stack):
     if not (token.tag == NAME and token.src == 'requires'):
         return None
-    ietg = RequiresCatcher(currentTG, token)
+    ietg = RequiresGroup(currentTG, token)
     currentTG._consumeToken(ietg, token.indent)
     return stack.push(ietg)
 
-class RequiresCatcher(_CommaSeparated):
+class RequiresGroup(_CommaSeparated):
     # include sdf.sdf.sdf, sdf.sdf   -> list of modules to include
     # alternative [asdf.asdf.asd, sdf.sdf.sf] include - but the asd.asd.asd are special and need to be interpreted
     # differently to other names
@@ -1129,11 +1129,11 @@ class RequiresCatcher(_CommaSeparated):
 
 def catchFromUses(token, currentTG, stack):
     if not (token.tag == NAME and token.src == 'from'): return None
-    fietg = FromImportCatcher(currentTG, token)
+    fietg = FromUseDefGroup(currentTG, token)
     currentTG._consumeToken(fietg, token.indent)
     return stack.push(fietg)
 
-class FromImportCatcher(_Tokens):
+class FromUseDefGroup(_Tokens):
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
         self.isInteruptable = False

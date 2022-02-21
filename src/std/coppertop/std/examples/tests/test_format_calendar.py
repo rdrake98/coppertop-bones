@@ -24,13 +24,13 @@ from coppertop.std import check, equal, strip, take, not_, _, count, wrapInList,
 from coppertop.std.datetime import addDays, parseDate, toCTimeFormat, day
 from bones.core.types import pydate
 
-from coppertop.range import EMPTY, getIRIter, ListOR, toIndexableFR, RaggedZipIR, FnAdapterFR, \
+from coppertop.std.range import EMPTY, getIRIter, ListOR, toIndexableFR, RaggedZipIR, FnAdapterFR, \
     ChunkUsingSubRangeGeneratorFR, pushAllTo
-from coppertop.range.std import front, rEach, materialise, rChain
+from coppertop.std.range import front, rEach, materialise, rChain
 
-from coppertop.range.examples.format_calendar import datesInYear, monthChunks, weekChunks, weekStrings, monthTitle, \
+from coppertop.std.examples.format_calendar import datesInYear, monthChunks, weekChunks, weekStrings, monthTitle, \
     monthLines, monthStringsToCalendarRow
-from coppertop.range.examples.format_calendar import _untilWeekdayName
+from coppertop.std.examples.format_calendar import _untilWeekdayName
 
 
 

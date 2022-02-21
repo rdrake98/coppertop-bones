@@ -24,7 +24,8 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from typing import Any, Union
 from coppertop.pipe import *
-from coppertop.core import Null
+from coppertop.core import Null, NotYetImplemented
+from bones.core.types import pyint, pylist
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - imports done')
 
@@ -38,6 +39,33 @@ if not hasattr(sys, '_EMPTY'):
             return 'EMPTY'
     sys._EMPTY = _EMPTY()
 EMPTY = sys._EMPTY
+
+
+# google
+# range n.
+# 2. a set of different things of the same general type.
+#     "the area offers a wide range of activities for the tourist"
+#
+# AHD
+# range n.
+# 9. A group or series of things extending in a line or row, especially a row or chain of mountains.
+# range v.intr.
+# 1. To vary within specified limits: sizes that range from small to extra large.
+# 2. To extend in a particular direction: a river that ranges to the east.
+# 4.
+#   a. To move through, along, or around in an area or region: Raiders ranged up and down the coast.
+#   b. To wander freely; roam: allowed the animals to range freely.
+# v.tr.
+# 1. To arrange or dispose in a particular order, especially in rows or lines: "In the front seats of the galleries were ranged the ladies of the court" (Carolly Erickson).
+# 2. To assign to a particular category; classify: Her works are often ranged under the headings Mystery and Science Fiction.
+# 3. To move through or along or around in (an area or region): The scouts ranged the mountain forests. The patrol boat ranged the coast.
+# 4. To look over or throughout (something): His eyes ranged the room, looking for the letter.
+#
+# cambridge
+# range n
+# a set of similar things:
+# I offered her a range of options.
+# There is a wide/whole range of opinions on this issue.
 
 
 # d style ranges
@@ -55,11 +83,11 @@ class IInputRange(object):
     def empty(self) -> bool:
         raise NotImplementedError()
     @property
-    def front(self) -> Any:
+    def front(self):
         raise NotImplementedError()
     def popFront(self) -> None:
         raise NotImplementedError()
-    def moveFront(self) -> Any:
+    def moveFront(self):
         raise NotImplementedError()
 
     # assignable
@@ -78,7 +106,7 @@ class IInputRange(object):
             self.r = r
         def __iter__(self) -> IInputRange:
             return self
-        def __next__(self) -> Any:
+        def __next__(self):
             if self.r.empty: raise StopIteration
             answer = self.r.front
             self.r.popFront()
@@ -97,9 +125,9 @@ class IForwardRange(IInputRange):
 
 class IBidirectionalRange(IForwardRange):
     @property
-    def back(self) -> Any:
+    def back(self):
         raise NotImplementedError()
-    def moveBack(self) -> Any:
+    def moveBack(self):
         raise NotImplementedError()
     def popBack(self) -> None:
         raise NotImplementedError()
@@ -111,7 +139,7 @@ class IBidirectionalRange(IForwardRange):
 
 
 class IRandomAccessFinite(IBidirectionalRange):
-    def moveAt(self, i: int) -> Any:
+    def moveAt(self, i: int):
         raise NotImplementedError()
     def __getitem__(self, i: Union[int, slice]) -> Union[Any, IRandomAccessFinite]:
         raise NotImplementedError()
@@ -125,10 +153,10 @@ class IRandomAccessFinite(IBidirectionalRange):
 
 
 class IRandomAccessInfinite(IForwardRange):
-    def moveAt(self, i: int) -> Any:
+    def moveAt(self, i: int):
         raise NotImplementedError()
 
-    def __getitem__(self, i: int) -> Any:
+    def __getitem__(self, i: int):
         """Answers an element"""
         raise NotImplementedError()
 
@@ -393,6 +421,92 @@ def allSubRangesExhausted(ror):
             answer = False
             break
     return answer
+
+@coppertop
+def rZip(r):
+    raise NotYetImplemented()
+
+@coppertop
+def rInject(r, seed, f):
+    raise NotYetImplemented()
+
+@coppertop
+def rFilter(r, f):
+    raise NotYetImplemented()
+
+@coppertop
+def rTakeBack(r, n):
+    raise NotYetImplemented()
+
+@coppertop
+def rDropBack(r, n):
+    raise NotYetImplemented()
+
+@coppertop
+def rFind(r, value):
+    while not r.empty:
+        if r.front == value:
+            break
+        r.popFront()
+    return r
+
+@coppertop
+def put(r, x):
+    return r.put(x)
+
+@coppertop(style=unary1)
+def front(r):
+    return r.front
+
+@coppertop(style=unary1)
+def back(r):
+    return r.back
+
+@coppertop(style=unary1)
+def empty(r):
+    return r.empty
+
+@coppertop(style=unary1)
+def popFront(r):
+    r.popFront()
+    return r
+
+@coppertop(style=unary1)
+def popBack(r):
+    r.popBack()
+    return r
+
+
+rEach = coppertop(style=binary2, newName='rEach')(EachFR)
+rChain = coppertop(style=unary1, newName='rChain')(ChainAsSingleFR)
+rUntil = coppertop(style=binary2, newName='rUntil')(UntilFR)
+
+
+@coppertop
+def replaceWith(haystack, needle, replacement):
+    return haystack >> rEach >> (lambda e: replacement if e == needle else e)
+
+@coppertop(style=binary2)
+def pushAllTo(inR, outR):
+    while not inR.empty:
+        outR.put(inR.front)
+        inR.popFront()
+    return outR
+
+def _materialise(r) -> pylist:
+    answer = list()
+    while not r.empty:
+        e = r.front
+        if isinstance(e, IInputRange) and not isinstance(e, IRandomAccessInfinite):
+            answer.append(_materialise(e))
+            if not r.empty:  # the sub range may exhaust this range
+                r.popFront()
+        else:
+            answer.append(e)
+            r.popFront()
+    return answer
+
+materialise = coppertop(style=unary1, newName='materialise')(_materialise)
 
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - done')

@@ -266,6 +266,17 @@ aliased = _BTAtom.define('aliased').setImplicit
 _weaken(anon, aliased)
 _weaken(named, aliased)
 
+__all__ += [
+    'null', 'void', 'missing',
+]
+
+
+litint = _BTAtom.define('litint').setExclusive
+litdec = _BTAtom.define('litdec').setExclusive
+litstring = _BTAtom.define('litstring').setExclusive
+litdate = _BTAtom.define('litdate').setExclusive
+litbool = _BTAtom.define('litbool').setExclusive
+
 ascii = _BTAtom.define('ascii').setExclusive
 utf8 = _BTAtom.define('utf8').setExclusive
 
@@ -274,7 +285,8 @@ bool = _BTAtom.ensure("bool")
 pair = _BTAtom.define('pair')
 
 __all__ += [
-    'null', 'void', 'missing', 'ascii', 'utf8', 'sym', 'bool', 'pair',
+    'litint', 'litdec', 'litstring', 'litdate', 'litbool',
+    'ascii', 'utf8', 'sym', 'bool', 'pair',
 ]
 
 

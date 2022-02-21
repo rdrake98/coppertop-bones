@@ -18,5 +18,6 @@
 
 class BonesError(Exception): pass
 class GroupingError(BonesError): pass
+class ParsingError(BonesError): pass
 
 

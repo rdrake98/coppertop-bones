@@ -17,15 +17,13 @@
 # **********************************************************************************************************************
 
 # see - https://en.wikipedia.org/wiki/Jackson_structured_programming
-# this file show four ways to implement the problem of counting repeated lines in a file
-# - two are translations from the wikipedia article and the remaining two take the "traditional"
-# program and transform it into range style code - given that CountEquals exhausts
-# the range r I'm not sure how one can claim it is functional.
+# this file show four ways to implement the problem of counting repeated lines in a file - two are translations from
+# the wikipedia article and the remaining two take the "traditional" program and transform it into range style code
 
 
 from coppertop.pipe import *
 from coppertop.std import getAttr, _
-from coppertop.range import FileLineIR, ListOR, IInputRange, put, pushAllTo
+from coppertop.std.range import FileLineIR, ListOR, IInputRange, put, pushAllTo
 
 
 def countLinesTrad(f):
@@ -118,11 +116,9 @@ class RepititionCountIR(IInputRange):
 
 
 
-
-
-# "Jackson criticises the traditional version, claiming that it hides the relationships which exist between
-# the input lines, compromising the program's understandability and maintainability by, for example,
-# forcing the use of a special case for the first line and forcing another special case for a final output operation."
+# "Jackson criticises the traditional version, claiming that it hides the relationships which exist between the
+# input lines, compromising the program's understandability and maintainability by, for example, forcing the use
+# of a special case for the first line and forcing another special case for a final output operation."
 
 def countLinesJsp(f):
     answer = []

@@ -18,7 +18,7 @@
 
 import os
 from coppertop.std import assertEquals
-from coppertop.range.examples.count_lines_jsp import countLinesJsp, countLinesTrad, countLinesRanges1, countLinesRanges2, countLinesRanges3
+from coppertop.std.examples.count_lines_jsp import countLinesJsp, countLinesTrad, countLinesRanges1, countLinesRanges2, countLinesRanges3
 
 
 home = os.path.dirname(os.path.abspath(__file__))

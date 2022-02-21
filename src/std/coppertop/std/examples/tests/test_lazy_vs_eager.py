@@ -18,7 +18,7 @@
 
 from coppertop.pipe import *
 from coppertop.std import each, check, equal
-from coppertop.range import FnAdapterFR, EMPTY, FnAdapterEager, rEach, materialise
+from coppertop.std.range import FnAdapterFR, EMPTY, FnAdapterEager, rEach, materialise
 from coppertop.std.datetime import addDays, parseDate, day, toCTimeFormat
 
 YYYY_MM_DD = 'YYYY.MM.DD' >> toCTimeFormat

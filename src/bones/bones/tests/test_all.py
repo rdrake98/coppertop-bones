@@ -21,61 +21,28 @@ sys._TRACE_IMPORTS = True
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
-# bones tests
-from bones.tests import test_all as bones_test_all
+# metatype tests
+from bones.core.tests import test_metatypes
+from bones.core.tests import test_fits
+from bones.core.tests import test_partition
+from bones.core.tests import test_polymorphic
 
-# core tests
-from coppertop.tests import test_styles
-from coppertop.tests import test_ns
-from coppertop.tests import test_anon_and_partial
-from coppertop.tests import test_pipeable
-from coppertop.tests import test_testing
-from coppertop.tests import test_scope
-from coppertop.tests import test_fx
-
-# std tests
-from coppertop.std.tests import test_agg_us_yields
-from coppertop.std.tests import test_std
-from coppertop.std._linalg.tests import test_linealg_core
-
-# range tests
-from coppertop.std.tests import test_range
-from coppertop.std.examples.tests import test_count_lines_jsp
-from coppertop.std.examples.tests import test_format_calendar
-from coppertop.std.examples.tests import test_lazy_vs_eager
-
-# dm tests
-from dm.tests import test_all as dm_test_all
+# lang tests
+from bones.lang.tests import test_lex
+from bones.lang.tests import test_group
 
 
 
 def main():
-    # bones
-    bones_test_all.main()
+    # metatype tests
+    test_fits.main()
+    test_metatypes.main()
+    test_partition.main()
+    test_polymorphic.main()
 
-    # coppertop
-    test_styles.main()
-    test_ns.main()
-    test_anon_and_partial.main()
-    test_pipeable.main()
-    test_testing.main()
-    test_scope.main()
-    test_fx.main()
-
-    # std
-    # test_agg.main()
-    test_agg_us_yields.main()
-    test_std.main()
-    test_linealg_core.main()
-
-    # range
-    test_range.main()
-    test_count_lines_jsp.main()
-    # test_format_calendar.main()
-    # test_lazy_vs_eager.main()
-
-    # dm
-    dm_test_all.main()
+    # lang tests
+    test_lex.main()
+    test_group.main()
 
 
 

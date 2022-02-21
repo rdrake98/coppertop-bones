@@ -23,7 +23,7 @@ from coppertop.core import Null
 from coppertop.pipe import *
 from coppertop.std import count, _, pad, join, wrapInList, to, joinAll
 from coppertop.std.datetime import day, weekday, weekdayName, monthLongName, addDays
-from coppertop.range import ChunkUsingSubRangeGeneratorFR, FnAdapterFR, ChunkFROnChangeOf, IForwardRange, \
+from coppertop.std.range import ChunkUsingSubRangeGeneratorFR, FnAdapterFR, ChunkFROnChangeOf, IForwardRange, \
     EMPTY, toIndexableFR, rEach, rUntil, rChain, replaceWith, RaggedZipIR, materialise
 from bones.core.types import pystr
 
