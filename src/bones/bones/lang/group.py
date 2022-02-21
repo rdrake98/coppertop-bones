@@ -56,6 +56,7 @@ SECTION_END = 2
 GROUP_END = 3
 
 MIN_INDENT_FOR_KEYWORD = 2
+MIN_INDENT_FOR_REQUIRES = 2
 
 from bones.lang.types import nullary, binary, rau, ternary, unary, noun
 
@@ -1005,7 +1006,6 @@ class KeywordCatcher(_CommaSeparated):
 
 
 
-
 # **********************************************************************************************************************
 # requires ...
 # **********************************************************************************************************************
@@ -1026,14 +1026,18 @@ class RequiresCatcher(_CommaSeparated):
         super().__init__(parent, opener)
         self.isInteruptable = False
         self._requiresIndent = Missing
+        self._awaitingTokensPostComma = False
 
     def _processCloserOrAnswerError(self, token):
         self._finalise()
         return self.parent._processCloserOrAnswerError(token)
 
     def _finalise(self):
-        self._phraseEndCause = SECTION_END
-        self._finishPhrase(Missing, self._phraseEndCause)
+        if self._phrase: self._finishPhrase(Missing, SECTION_END)
+        if len(self._commaList) == 0:
+            raise GroupingError(f'requires - no items specified - needs better error msg')
+        if self._awaitingTokensPostComma:
+            raise GroupingError(f'requires - missing items after last comma - needs better error msg')
         super()._finalise()
 
     @property
@@ -1068,6 +1072,7 @@ class RequiresCatcher(_CommaSeparated):
             if self._phrase:
                 self._commaList << self._phrase
                 self._startNewPhrase()
+                self._awaitingTokensPostComma = True
             else:
                 raise GroupingError(f"Encountered COMMA without a NAME - better error msg needed")
 
@@ -1076,6 +1081,7 @@ class RequiresCatcher(_CommaSeparated):
 
         else:
             self._phrase.append(tokenOrGroup)
+            self._awaitingTokensPostComma = False
 
         self._requiresIndent = self._requiresIndent or indent
         return True
@@ -1099,12 +1105,12 @@ class RequiresCatcher(_CommaSeparated):
                 raise ProgrammerError()
         else:
             if cause == SUGGESTED_BY_LINE_BREAK:
-                if indent > self._requiresIndent:
-                    # e.g. new line after requires
+                if indent >= self._requiresIndent + MIN_INDENT_FOR_REQUIRES:
+                    # e.g. new line after requires, new line after COMMA
                     pass
                 else:
-                    # e.g. new line after COMMA
-                    pass
+                    # end the requires phrase
+                    self._finalise()
             elif cause == SECTION_END:
                 self._finalise()
             else:
@@ -1114,6 +1120,7 @@ class RequiresCatcher(_CommaSeparated):
         self.parent._finishPhrase(Missing, SECTION_END)
         super()._finalise()
         return self.parent._consumeToken(tokenOrGroup, indent)
+
 
 
 # **********************************************************************************************************************

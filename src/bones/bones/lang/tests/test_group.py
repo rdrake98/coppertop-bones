@@ -29,19 +29,13 @@ from bones.lang.sym import SymTable
 
 
 # TODO
-# GROUP
-# blank lines should have indent = 0 - lexer change
 # add continuation across multiple groups on same line
 # add return types
 # add binary functions {{x+y}}
 # figure when to determine style of functions as needed as input for parser
 # add from x.y.z uses (or from use? no, from define?)
+# add syntax error tests
 # improve error descriptions
-#
-# EXPR / PHRASE / PIPE - parse_tokens (lex), parse_groups, parse_pipes
-# lex, group, parse_tokens,
-# tokenise, group, parse_tokens
-
 
 
 def main():
@@ -53,12 +47,11 @@ def main():
 
 
 def test_current():
-    src = r'''
+    src = r'''     
+        
         requires 
-            my_first_bones.conversions, 
-            constants             // constants added to stretch the rquires parsing
+            a
             
-        // fred
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
@@ -83,6 +76,43 @@ def test_errors():
     with assertRaises(GroupingError) as ex:
         determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
     ex.exceptionValue.args[0] >> PP
+
+    src = r'''     
+            requires 
+
+        '''
+    tokens, lines = lex.lexBonesSrc(src, SymTable())
+    with assertRaises(GroupingError) as ex:
+        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    ex.exceptionValue.args[0] >> PP
+
+    src = r'''requires'''
+    tokens, lines = lex.lexBonesSrc(src, SymTable())
+    with assertRaises(GroupingError) as ex:
+        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    ex.exceptionValue.args[0] >> PP
+
+
+    src = r'''     
+            requires 
+                coppertop.std,
+        '''
+    tokens, lines = lex.lexBonesSrc(src, SymTable())
+    with assertRaises(GroupingError) as ex:
+        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    ex.exceptionValue.args[0] >> PP
+
+
+    src = r'''     
+            requires 
+                coppertop.std,    
+            fred * joe
+        '''
+    tokens, lines = lex.lexBonesSrc(src, SymTable())
+    with assertRaises(GroupingError) as ex:
+        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    ex.exceptionValue.args[0] >> PP
+
 
 
 def test():

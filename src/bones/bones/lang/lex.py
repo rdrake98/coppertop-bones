@@ -472,7 +472,7 @@ def lexBonesSrc(src, symbols):
                     # I'm not confident that it's quicker for me to implement the following in regex, and I'm not
                     # confident regex will execute it any faster. Adding state to the lex loop feels a little hacky but
                     # appropiate if lexing is taken as a whole however I suspect this little state machine could
-                    # be generalised. The folloiwing implies that a:b is NAME_COLON and
+                    # be generalised. The following implies that a:b is NAME_COLON and
                     # that a space is needed for ASSIGN_RIGHT, i.e. a :b
                     if  (priorTag in (NAME, )) and tag == COLON:
                         # merge NAME COLON sequence (with no WHITE_BREAK in between) into a NAME_COLON
@@ -492,7 +492,12 @@ def lexBonesSrc(src, symbols):
                     elif tag in (L_BRACE_BRACKET, L_PAREN_BRACKET):
                         tokens.append(Token(''.join(text.split()), tag, indent, len(tokens), c1, c2, l1, l2))
                     else:
-                        tokens.append(Token(text, tag, indent, len(tokens), c1, c2, l1, l2))
+                        if tag == LINE_BREAK and indent + 1 == (c2 - lines[l1].c1):
+                            # set blank lines to have indent of 0 (thus forcing a new phrase)
+                            tokens.append(Token(text, tag, 0, len(tokens), c1, c2, l1, l2))
+                        else:
+                            print(l1, prettyNameByTag[tag], indent, c1, (c2 - lines[l1].c1))
+                            tokens.append(Token(text, tag, indent, len(tokens), c1, c2, l1, l2))
                 if tag in (LINE_BREAK, CONTINUATION):
                     indent = 0
                 break
