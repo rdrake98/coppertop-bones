@@ -477,14 +477,14 @@ def popBack(r):
     return r
 
 
-rEach = coppertop(style=binary2, newName='rEach')(EachFR)
+each_ = coppertop(style=binary2, newName='each_')(EachFR)
 rChain = coppertop(style=unary1, newName='rChain')(ChainAsSingleFR)
 rUntil = coppertop(style=binary2, newName='rUntil')(UntilFR)
 
 
 @coppertop
 def replaceWith(haystack, needle, replacement):
-    return haystack >> rEach >> (lambda e: replacement if e == needle else e)
+    return haystack >> each_ >> (lambda e: replacement if e == needle else e)
 
 @coppertop(style=binary2)
 def pushAllTo(inR, outR):
@@ -493,7 +493,7 @@ def pushAllTo(inR, outR):
         inR.popFront()
     return outR
 
-def _materialise(r) -> pylist:
+def _materialise(r):
     answer = list()
     while not r.empty:
         e = r.front

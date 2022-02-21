@@ -17,7 +17,7 @@
 # **********************************************************************************************************************
 
 from coppertop.std import check, equal
-from coppertop.std.range import rEach, rChain
+from coppertop.std.range import each_, rChain
 from coppertop.std.range import IndexableFR, ListOR, getIRIter, materialise
 
 
@@ -38,7 +38,7 @@ def test_rangeOrRanges():
     [e for e in rOfR >> getIRIter] >> check >> equal >> [1,2]
 
 def test_other():
-    [1, 2, 3] >> rEach >> (lambda x: x) >> materialise >> check >> equal >> [1, 2, 3]
+    [1, 2, 3] >> each_ >> (lambda x: x) >> materialise >> check >> equal >> [1, 2, 3]
 
 def test_take():
     r1 = IndexableFR([1,2,3])

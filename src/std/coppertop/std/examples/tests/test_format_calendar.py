@@ -26,7 +26,7 @@ from bones.core.types import pydate
 
 from coppertop.std.range import EMPTY, getIRIter, ListOR, toIndexableFR, RaggedZipIR, FnAdapterFR, \
     ChunkUsingSubRangeGeneratorFR, pushAllTo
-from coppertop.std.range import front, rEach, materialise, rChain
+from coppertop.std.range import front, each_, materialise, rChain
 
 from coppertop.std.examples.format_calendar import datesInYear, monthChunks, weekChunks, weekStrings, monthTitle, \
     monthLines, monthStringsToCalendarRow
@@ -59,9 +59,14 @@ def test_allDaysInYear():
 
 
 def test_datesBetween():
-    ('2020.01.16' >> parseDate(_, YYYY_MM_DD)) >> datesBetween >> ('2020.01.29' >> parseDate(_, YYYY_MM_DD)) \
-    >> rEach >> day \
-    >> materialise >> check >> equal >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    d1 = ('2020.01.16' >> parseDate(_, YYYY_MM_DD))
+    d2 = ('2020.01.29' >> parseDate(_, YYYY_MM_DD))
+    days_ = d1 >> datesBetween >> d2 >> each_ >> day
+    days = days_ >> materialise
+    days >> check >> equal >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    # ('2020.01.16' >> parseDate(_, YYYY_MM_DD)) >> datesBetween >> ('2020.01.29' >> parseDate(_, YYYY_MM_DD)) \
+    # >> each_ >> day \
+    # >> materialise >> check >> equal >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 
 
 def test_chunkingIntoMonths():
@@ -123,7 +128,7 @@ def test_WeekStrings():
 
 def test_MonthTitle():
     1 >> monthTitle(_, 21) >> wrapInList >> toIndexableFR \
-        >> rEach >> strip >> materialise \
+        >> each_ >> strip >> materialise \
         >> check >> equal >> ['January']
 
 
@@ -150,7 +155,7 @@ def test_firstQuarter():
     2020 >> datesInYear \
         >> monthChunks \
         >> take >> 3 \
-        >> RaggedZipIR >> rEach >> monthStringsToCalendarRow(Null, " "*21, " ")
+        >> RaggedZipIR >> each_ >> monthStringsToCalendarRow(Null, " "*21, " ")
 
 
 

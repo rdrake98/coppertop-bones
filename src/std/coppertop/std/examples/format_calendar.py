@@ -24,7 +24,7 @@ from coppertop.pipe import *
 from coppertop.std import count, _, pad, join, wrapInList, to, joinAll
 from coppertop.std.datetime import day, weekday, weekdayName, monthLongName, addDays
 from coppertop.std.range import ChunkUsingSubRangeGeneratorFR, FnAdapterFR, ChunkFROnChangeOf, IForwardRange, \
-    EMPTY, toIndexableFR, rEach, rUntil, rChain, replaceWith, RaggedZipIR, materialise
+    EMPTY, toIndexableFR, each_, rUntil, rChain, replaceWith, RaggedZipIR, materialise
 from bones.core.types import pystr
 
 @coppertop
@@ -68,7 +68,7 @@ class WeekStringsRange(IForwardRange):
         week = self.rOfWeeks.front
         startDay = week.front >> weekday
         preBlanks = ['   '] * startDay
-        dayStrings = week >> rEach >> dateAsDayString >> materialise
+        dayStrings = week >> each_ >> dateAsDayString >> materialise
         postBlanks = ['   '] * (7 - ((dayStrings >> count) + startDay))
         return (preBlanks + dayStrings + postBlanks) >> joinAll
 
@@ -99,5 +99,5 @@ def monthStringsToCalendarRow(strings, blank, sep):
 
 
 def pasteBlocks(rOfMonthChunk):
-    return rOfMonthChunk >> RaggedZipIR >> rEach >> monthStringsToCalendarRow(" "*21, " ")
+    return rOfMonthChunk >> RaggedZipIR >> each_ >> monthStringsToCalendarRow(" "*21, " ")
 
