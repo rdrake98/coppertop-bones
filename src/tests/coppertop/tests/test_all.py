@@ -43,6 +43,7 @@ from coppertop.std.tests import test_range
 from coppertop.std.examples.tests import test_count_lines_jsp
 from coppertop.std.examples.tests import test_format_calendar
 from coppertop.std.examples.tests import test_lazy_vs_eager
+from coppertop.std.examples.tests import test_misc as examples_test_misc
 
 # dm tests
 from dm.tests import test_all as dm_test_all
@@ -71,8 +72,9 @@ def main():
     # range
     test_range.main()
     test_count_lines_jsp.main()
-    # test_format_calendar.main()
-    # test_lazy_vs_eager.main()
+    test_format_calendar.main()
+    test_lazy_vs_eager.main()
+    examples_test_misc.main()
 
     # dm
     dm_test_all.main()

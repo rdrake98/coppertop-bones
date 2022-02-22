@@ -37,8 +37,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 import inspect
-from coppertop.core import Missing, ProgrammerError
+from coppertop.core import Missing, ProgrammerError, NotYetImplemented
 from coppertop.pipe import coppertop
+from coppertop.std.range import IForwardRange
 
 from bones.lang.core import GroupingError
 
@@ -58,12 +59,138 @@ GROUP_END = 3
 MIN_INDENT_FOR_KEYWORD = 2
 MIN_INDENT_FOR_REQUIRES = 2
 
+DEPTH_FIRST = 1
+BREADTH_FIRST = 2
+
 from bones.lang.types import nullary, binary, rau, ternary, unary, noun
 
 
 
+class DepthFirstTGVisitor(IForwardRange):
 
-def determineGrouping(tokens, extraCatchers=[]):
+    def __init__(self, snippet):
+        self._indices = []
+        self._stack = []
+        self._pushGroup(snippet)
+        self._pushing = Missing
+        self._popping = Missing
+        self._nextExpr = False
+        self._nextBlock = False
+
+    @property
+    def empty(self):
+        return len(self._indices) == 0
+
+    @property
+    def front(self):
+        if self._pushing is not Missing:
+            return self._pushing
+        elif self._popping is not Missing:
+            return self._popping
+        else:
+            return self._stack[-1]._at(self._indices[-1])
+
+    @property
+    def frontIsFirstToken(self):
+        i, j, k = self._indices[-1]
+        return k == 0
+
+    @property
+    def frontIsOpening(self):
+        return self._pushing is not Missing
+
+    @property
+    def frontIsClosing(self):
+        return self._popping is not Missing
+
+    @property
+    def frontIsNewExpr(self):
+        return self._nextExpr
+
+    @property
+    def frontIsNewBlock(self):
+        return self._nextBlock
+
+    def popFront(self):
+        self._nextExpr = False
+        self._nextBlock = False
+        if self._pushing:
+            self._pushing = Missing
+            if len(self._stack[-1].grid) == 0 or \
+                    len(self._stack[-1].grid[0]) == 0 or \
+                    len(self._stack[-1].grid[0][0]) == 0:
+                # handle empty EG
+                self._popping = self._stack[-1]
+                self._stack = self._stack[0:-1]
+                self._indices = self._indices[0:-1]
+            else:
+                # handle first element is group
+                firstElement = self._stack[-1].grid[0][0][0]
+                if isinstance(firstElement, (
+                    DefListGroup, ImListGroup, FunctionGroup, DefParamsGroup, ImParamsGroup,
+                    TableGroup, TypeLangGroup, RequiresGroup, FromUseDefGroup
+                )):
+                    self._pushGroup(firstElement)
+        else:
+            if self._popping:
+                self._popping = Missing
+
+            # next token in expr
+            i, j, k = self._indices[-1]
+            k += 1
+
+            # handle end of expr
+            if k == len(self._stack[-1].grid[i][j]):
+                self._nextExpr = True
+                self._nextBlock = False
+                k = 0
+                j += 1
+
+            # handle end of block
+            if j == len(self._stack[-1].grid[i]):
+                self._nextExpr = False
+                self._nextBlock = True
+                j = 0
+                i += 1
+
+            self._indices[-1] = [i, j, k]
+            if i == len(self._stack[-1].grid):
+                # handle end of group
+                self.popGroup()
+            else:
+                # handle new group
+                newElement = self._stack[-1].grid[i][j][k]
+                if isinstance(newElement, (
+                    DefListGroup, ImListGroup, FunctionGroup, DefParamsGroup, ImParamsGroup,
+                    TableGroup, TypeLangGroup, RequiresGroup, FromUseDefGroup
+                )):
+                    self._pushGroup(newElement)
+
+    def popGroup(self):
+        self._nextExpr = False
+        self._nextBlock = False
+        self._pushing = Missing
+        self._popping = self._stack[-1]
+        self._stack = self._stack[0:-1]
+        self._indices = self._indices[0:-1]
+
+    def _pushGroup(self, tg):
+        self._pushing = tg
+        self._stack.append(tg)
+        self._indices.append([0] * tg._numIndices)
+
+    def save(self):
+        raise NotYetImplemented()
+
+
+
+class BreadthFirstGroupVisitor(IForwardRange):
+    pass
+
+
+
+def determineGrouping(tokens):
+    extraCatchers = (catchKeyword, catchRequires, catchFromUses)
     stack = _Stack()
     currentTG = stack.push(SnippetGroup(None, None))   # this one obviously doesn't need catching!!
     openers = (L_PAREN, L_BRACKET, L_ANGLE_COLON, L_BRACE_BRACKET, L_BRACE_PAREN, L_BRACE, L_PAREN_BRACKET)
@@ -86,7 +213,7 @@ def determineGrouping(tokens, extraCatchers=[]):
             if normal:
                 currentTG._consumeToken(token, token.indent)
                 caught = True
-        # then give the extraCatchers to override the core bones grouping
+        # then give the extraCatchers the opportunity to override the core bones grouping
         if not isInteruptable:
             if not caught:
                 for catcher in extraCatchers:
@@ -214,6 +341,19 @@ class _Tokens(object):
         self._consuming = True
         self.isInteruptable = True
 
+    def _indices(self):
+        return (0,)
+
+    def _at(self, indices):
+        return self._phrase[indices[0]]
+
+    def _inc(self, indices):
+        phrase = self._phrase
+        if indices[0]-1 == len(phrase):
+            return Missing
+        else:
+            return (indices[0] + 1,)
+
     def _startNewPhrase(self):
         self._phrase = _Phrase()
         self._phraseIndent = Missing
@@ -313,12 +453,36 @@ class _Tokens(object):
 
 
 
-class _CommaSeparated(_Tokens):
+class _CommaSepPhrases(_Tokens):
     #  N**phrase separated by COMMA - e.g. parameters, keyword style call, table, table keys
 
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
         self._commaList = _CommaList()
+
+    def _indices(self):
+        return (0,0)
+
+    def _at(self, indices):
+        i, j = indices
+        return self._commaList[i][j]
+
+    def _inc(self, indices, direction):
+        if direction == DEPTH_FIRST:
+            i, j = indices
+            commaList = self._commaList
+            if i - 1 == len(commaList):
+                return Missing
+            else:
+                phrase = commaList[i]
+                if j - 1 == len(phrase):
+                    i += 1
+                    j = -1
+                    return self._inc((i,j))
+                else:
+                    return (indices[0], indices[1] + 1)
+        else:
+            raise NotImplementedError
 
     def _startNewCommaSection(self):
         pass
@@ -379,12 +543,16 @@ class _CommaSeparated(_Tokens):
 
 
 
-class _DotSeparated(_Tokens):
+class _DotSepPhrases(_Tokens):
     # N**phrase separated by DOT / LINE_BREAK - e.g. snippet, function
 
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
         self._dotList = _DotList()
+
+    @property
+    def _numIndices(self):
+        return 2
 
     def _finishPhrase(self, indent, cause):
         tokens = self._phrase
@@ -435,12 +603,16 @@ class _DotSeparated(_Tokens):
 
 
 
-class _Row(_DotSeparated):
+class _CommaSepDots(_DotSepPhrases):
     # list of exprs separated by COMMA - only as a row of IMList and DefList
 
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
-        self._row = _Row()
+        self._row = _CommaSepDots()
+
+    @property
+    def _numIndices(self):
+        return 3
 
     def _startNewCommaSection(self):
         self._dotList = _DotList()
@@ -476,15 +648,19 @@ class _Row(_DotSeparated):
 
 
 
-class _Grid(_Row):
+class _SemiColonSepCommas(_CommaSepDots):
     # list of exprs1D separated by SEMI_COLON - e.g. ImList, DefList
 
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
-        self._grid = _Grid()
+        self._grid = _SemiColonSepCommas()
+
+    @property
+    def _numIndices(self):
+        return 4
 
     def _startNewSemicolonSection(self):
-        self._row = _Row()
+        self._row = _CommaSepDots()
 
     def _finishSemicolonSection(self):
         if self._row:
@@ -567,7 +743,7 @@ def _procesAssigmentsInPhrase(phrase):
 # snippet
 # **********************************************************************************************************************
 
-class SnippetGroup(_DotSeparated):
+class SnippetGroup(_DotSepPhrases):
     def _finalise(self):
         assert self._consuming
         # since a Snippet has no closing token we have to close when the main parsing loop calls _finalise
@@ -577,6 +753,7 @@ class SnippetGroup(_DotSeparated):
         raise GroupingError("COMMA not valid in snippet")
     def _semicolonEncountered(self):
         raise GroupingError("SEMI_COLON not valid in snippet")
+
 
 
 # **********************************************************************************************************************
@@ -589,7 +766,7 @@ def catchLBracket(token, currentTG, stack):
     currentTG._consumeToken(dl, token.indent)
     return stack.push(dl)
 
-class DefListGroup(_Grid):
+class DefListGroup(_SemiColonSepCommas):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_BRACKET: return prettyNameByTag(R_BRACKET)
         self._finishPhrase(Missing, SECTION_END)
@@ -612,7 +789,7 @@ def catchLParen(token, currentTG, stack):
     currentTG._consumeToken(il, token.indent)
     return stack.push(il)
 
-class ImListGroup(_Grid):
+class ImListGroup(_SemiColonSepCommas):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_PAREN: return prettyNameByTag(R_PAREN)
         self._finishPhrase(Missing, SECTION_END)
@@ -655,7 +832,12 @@ def catchLBraceParen(token, currentTG, stack):
     return stack.push(ip)
 
 
-class FunctionGroup(_DotSeparated):
+class FunctionGroup(_DotSepPhrases):
+    # Fn - 3 groups - first two may be empty in tg but not in tc, also in tc
+    #   [CommaSepPhrases]           aka Params +
+    #     Name [TypeLang=TBI]       aka Param
+    #   [TypeLang=TBI]              aka RetType
+    #   DotSepPhrases
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
         self._params = Missing
@@ -683,7 +865,7 @@ class FunctionGroup(_DotSeparated):
 
 
 
-class _ParamsTokens(_CommaSeparated):
+class _ParamsTokens(_CommaSepPhrases):
     
     def __init__(self, parent, opener):
         super().__init__(parent, opener)
@@ -794,12 +976,12 @@ def catchLParenBracket(token, currentTG, stack):
     tktg = TableKeysGroup(ttg, token)
     return stack.push(tktg)
 
-class TableGroup(_CommaSeparated):
+class TableGroup(_CommaSepPhrases):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_PAREN: return prettyNameByTag(R_PAREN)
         self._finalise()
 
-class TableKeysGroup(_CommaSeparated):
+class TableKeysGroup(_CommaSepPhrases):
     def _processCloserOrAnswerError(self, token):
         if token.tag != R_BRACKET: return prettyNameByTag(R_BRACKET)
         self._finalise()
@@ -857,7 +1039,7 @@ def lastKv(d):
 def atIfNonePut(d, k, v):
     return d.setdefault(k, v)
 
-class _KeywordCatcher(_CommaSeparated):
+class _KeywordCatcher(_CommaSepPhrases):
 
     def _consumeToken(self, tokenOrGroup, indent):
         assert self._consuming
@@ -975,7 +1157,7 @@ class _KeywordCatcher(_CommaSeparated):
 
         argsImList = ImListGroup(self.parent, self._opener)
 
-        exprs1D = _Row()
+        exprs1D = _CommaSepDots()
         for expr in self._commaList:
             for tokenOrGroup in expr:
                 if isinstance(tokenOrGroup, _Tokens):
@@ -983,9 +1165,9 @@ class _KeywordCatcher(_CommaSeparated):
             _dotList = _DotList()
             _dotList << expr
             exprs1D << _dotList
-        grid = _Grid()
+        grid = _SemiColonSepCommas()
         grid << exprs1D
-        argsImList._grid = _Grid(grid)
+        argsImList._grid = _SemiColonSepCommas(grid)
         argsImList._finalise()
 
         self._tokensForParent.append(argsImList)
@@ -1017,7 +1199,7 @@ def catchRequires(token, currentTG, stack):
     currentTG._consumeToken(ietg, token.indent)
     return stack.push(ietg)
 
-class RequiresGroup(_CommaSeparated):
+class RequiresGroup(_CommaSepPhrases):
     # include sdf.sdf.sdf, sdf.sdf   -> list of modules to include
     # alternative [asdf.asdf.asd, sdf.sdf.sf] include - but the asd.asd.asd are special and need to be interpreted
     # differently to other names
@@ -1241,7 +1423,7 @@ class _DotList(list):
         return super().append(other)
 
 
-class _Row(list):
+class _CommaSepDots(list):
     # comma separated list of paragraph (_DotList)
     def __lshift__(self, other):   # self << other
         if not isinstance(other, _DotList) and other is not Missing:
@@ -1264,11 +1446,11 @@ class _Row(list):
         return super().append(other)
 
 
-class _Grid(list):
+class _SemiColonSepCommas(list):
     # aka matrix (of paragraphs)
-    # list of _Row
+    # list of _CommaSepDots
     def __lshift__(self, other):  # self << other
-        if not isinstance(other, _Row) and other is not Missing:
+        if not isinstance(other, _CommaSepDots) and other is not Missing:
             raise TypeError()
         self.append(other)
         return self
@@ -1283,7 +1465,7 @@ class _Grid(list):
         pps = [('' if tokenGroupOrRow is Missing else tokenGroupOrRow.PPGroup) for tokenGroupOrRow in self]
         return '; '.join(pps)
     def append(self, other):
-        if not isinstance(other, _Row) and other is not Missing:
+        if not isinstance(other, _CommaSepDots) and other is not Missing:
             raise TypeError()
         return super().append(other)
 

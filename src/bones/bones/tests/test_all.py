@@ -30,6 +30,8 @@ from bones.core.tests import test_polymorphic
 # lang tests
 from bones.lang.tests import test_lex
 from bones.lang.tests import test_group
+from bones.lang.tests import test_group_visitors
+from bones.lang.tests import test_sym
 
 
 
@@ -41,8 +43,10 @@ def main():
     test_polymorphic.main()
 
     # lang tests
+    test_sym.main()
     test_lex.main()
     test_group.main()
+    # test_group_visitors.main()
 
 
 
@@ -53,4 +57,3 @@ if __name__ == '__main__':
     from coppertop.std import count
     from coppertop.core import Missing
     print([t for t in BType._BTypeById if t is not Missing] >> count)
-

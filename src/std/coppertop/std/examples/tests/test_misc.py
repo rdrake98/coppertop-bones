@@ -16,7 +16,7 @@
 #
 # **********************************************************************************************************************
 
-from coppertop.range.examples.misc import Fred
+from coppertop.std.examples.misc import Fred
 from coppertop.pipe import _
 from coppertop.std import assertEquals, to, stdout
 

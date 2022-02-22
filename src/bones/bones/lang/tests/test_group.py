@@ -24,7 +24,7 @@ from coppertop.std import assertEquals
 
 from bones.lang import lex
 from bones.lang.core import GroupingError
-from bones.lang.group import determineGrouping, catchKeyword, catchRequires, catchFromUses
+from bones.lang.group import determineGrouping
 from bones.lang.sym import SymTable
 
 
@@ -55,7 +55,7 @@ def test_current():
             
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '{I}'
 
@@ -66,7 +66,7 @@ def test_errors():
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     with assertRaises(GroupingError) as ex:
-        determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        determineGrouping(tokens)
     ex.exceptionValue.args[0] >> PP
 
 
@@ -75,7 +75,7 @@ def test_errors():
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     with assertRaises(GroupingError) as ex:
-        determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        determineGrouping(tokens)
     ex.exceptionValue.args[0] >> PP
 
     src = r'''     
@@ -84,13 +84,13 @@ def test_errors():
         '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     with assertRaises(GroupingError) as ex:
-        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        snippet = determineGrouping(tokens)
     ex.exceptionValue.args[0] >> PP
 
     src = r'''requires'''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     with assertRaises(GroupingError) as ex:
-        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        snippet = determineGrouping(tokens)
     ex.exceptionValue.args[0] >> PP
 
 
@@ -100,7 +100,7 @@ def test_errors():
         '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     with assertRaises(GroupingError) as ex:
-        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        snippet = determineGrouping(tokens)
     ex.exceptionValue.args[0] >> PP
 
 
@@ -111,7 +111,7 @@ def test_errors():
         '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
     with assertRaises(GroupingError) as ex:
-        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        snippet = determineGrouping(tokens)
     ex.exceptionValue.args[0] >> PP
 
 
@@ -123,7 +123,7 @@ def test():
         b do: 2
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'n (n, l). n (n, l)'
 
@@ -133,7 +133,7 @@ def test():
         a each {x*2} <:matrix> 
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '(l, l, l; l, l, l) n {[n:t, n:t, n:t, n:t] n o n} (, l, l, l) {:a}. n n {n o l} t'
 
@@ -141,7 +141,7 @@ def test():
     # a: a was returning '{a:} (, n)' rather than '{a:} n'
     src = 'b: a. b: 2. b: 2 + a. a: 2 + 1. a'
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'n {:b}. l {:b}. l o n {:b}. l o l {:a}. n'
 
@@ -152,7 +152,7 @@ def test():
         ("one thing")
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '(). (l)'
 
@@ -166,7 +166,7 @@ def test():
         [;,]
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '(, ). (, , ). (; ). (; ; ). [; , ]'
 
@@ -177,7 +177,7 @@ def test():
         b: 2
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'l {:a}. l {:b}'
 
@@ -189,7 +189,7 @@ def test():
         fred: {[a:int, b :float] ^ z <:string>}
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '{[n o] o [n o] {:a} {:a}}. n [] t {:a}. l t {:x} t {:y} o l {:z}. {[n:t, n:t] o n t} {:fred}'
 
@@ -203,7 +203,7 @@ def test():
         d: c <:num>
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'l {:a}. n n t {:b} o l {:c}. n o l. n t {:d}'
 
@@ -217,7 +217,7 @@ def test():
         ]
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '[l {:a}. l {:b}, l {:c}. l {:d}; l; ]'
 
@@ -234,7 +234,7 @@ def test():
         ]
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'n n [l, [l {:a}. l {:b}], l, (, )]'
 
@@ -248,7 +248,7 @@ def test():
         1 + 1
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'n (n n n, [.n], {.n}) {:a}. l o l'
 
@@ -259,7 +259,7 @@ def test():
         a == b
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'l {R_ANGLE} l t. n o n'
 
@@ -269,7 +269,7 @@ def test():
         (1,2,3) do: {[x] (x square * .a) + (x * .b) + .c}    // <:unary> is the default for functions
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> 'n ((l, l, l), {[n:t] (n n o .n) o (n o .n) o .n})'
 
@@ -284,7 +284,7 @@ def test():
         (1,2,3) do: {[x] (x square * .a) + (x * .b) + .c}    // <:unary> is the default for functions
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
 
 
@@ -303,7 +303,7 @@ def test():
         ]
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
 
 
@@ -333,7 +333,7 @@ def test():
             finishingWith(aHat)
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
 
 
@@ -352,7 +352,7 @@ def test():
         stderr (1.0 / constants.zero)          // what are we going to do about this?
     '''
     tokens, lines = lex.lexBonesSrc(src, SymTable())
-    snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+    snippet = determineGrouping(tokens)
     pp = snippet.PPGroup
     pp >> assertEquals >> '{I}. n l l. l {:a}. l {:b} o n n {:c}. n n. n (l o n)'
 
@@ -364,7 +364,7 @@ def test_group_bones_files():
         with open(pfn) as f:
             src = f.read()
         tokens, lines = lex.lexBonesSrc(src, SymTable())
-        snippet = determineGrouping(tokens, [catchKeyword, catchRequires, catchFromUses])
+        snippet = determineGrouping(tokens)
         snippet.PPGroup >> PP
 
 

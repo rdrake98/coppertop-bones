@@ -59,14 +59,10 @@ def test_allDaysInYear():
 
 
 def test_datesBetween():
-    d1 = ('2020.01.16' >> parseDate(_, YYYY_MM_DD))
-    d2 = ('2020.01.29' >> parseDate(_, YYYY_MM_DD))
-    days_ = d1 >> datesBetween >> d2 >> each_ >> day
-    days = days_ >> materialise
-    days >> check >> equal >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
-    # ('2020.01.16' >> parseDate(_, YYYY_MM_DD)) >> datesBetween >> ('2020.01.29' >> parseDate(_, YYYY_MM_DD)) \
-    # >> each_ >> day \
-    # >> materialise >> check >> equal >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
+    ('2020.01.16' >> parseDate(_, YYYY_MM_DD)) >> datesBetween >> ('2020.01.29' >> parseDate(_, YYYY_MM_DD)) \
+        >> each_ >> day \
+        >> materialise \
+        >> check >> equal >> [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29]
 
 
 def test_chunkingIntoMonths():
