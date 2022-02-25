@@ -1,8 +1,8 @@
 ## BONES
 
-Bones is a minimalist high level scripting language (intended for ages 8 - 80+) for data wrangling and 
-algorithm development combining the pithiness of kdb/q and the scalability and readability of Smalltalk 
-with multiple-dispatch, partial functions and a strong algebraic type system.
+Bones is a scalable, minimalist, high level scripting language (intended for people ages 8 - 80+) for data wrangling 
+and algorithm development combining the pithiness of kdb/q and the readability of Smalltalk with multiple-dispatch, 
+partial functions and a strong algebraic type system.
 
 <br>
 Fundamental values

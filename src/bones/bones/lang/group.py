@@ -17,6 +17,11 @@
 # **********************************************************************************************************************
 
 
+# grouping is the second step in a multistage process of converting bones source code into executable code
+# in grouping we parse sequences of tokens (the output of the lex stage) into groups of phrases - a phrase is
+# an atomic expression in bones. the groups capture how the user organises the program and include functions,
+# lists, type lang expression, tables, references and inclusions, etc.
+#
 # key components
 #
 # determineGrouping
@@ -41,7 +46,7 @@ from coppertop.core import Missing, ProgrammerError, NotYetImplemented
 from coppertop.pipe import coppertop
 from coppertop.std.range import IForwardRange
 
-from bones.lang.core import GroupingError
+from bones.core.structs import GroupingError
 
 from bones.lang.lex import Token, L_ANGLE_COLON, L_PAREN, L_BRACKET, L_BRACE, R_ANGLE, R_PAREN, R_BRACKET, \
     R_BRACE, COMMA, L_PAREN_BRACKET, L_BRACE_BRACKET, prettyNameByTag, NAME_COLON, LINE_COMMENT, \

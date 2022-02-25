@@ -16,8 +16,29 @@
 #
 # **********************************************************************************************************************
 
-class BonesError(Exception): pass
+
+from bones.lang.explaining import descriptionByLocationId
+
+class BonesError(Exception):
+    def __init__(self, msg, locationId):
+        super().__init__(msg)
+        self._locationId = locationId
+        assert locationId in descriptionByLocationId
+
 class GroupingError(BonesError): pass
+
 class ParsingError(BonesError): pass
 
 
+# our exception handling should allow locations to be accumulated on unwind so a library programmer can describe
+# more precisely the cause and possible solutions to an error
+
+class SrcPtr(object):
+    # should be compact?
+    def __init__(self, srcId, c1, c2):
+        self.srcId = srcId      # u16 64k sources?
+        self.c1 = c1            # u24 250MB?
+        self.c2 = c2            # u24 250MB?
+
+
+# coppertop piping etc should use this framework too - hence it lives in core not lang
