@@ -46,6 +46,7 @@ from coppertop.core import Missing, ProgrammerError, NotYetImplemented
 from coppertop.pipe import coppertop
 from coppertop.std.range import IForwardRange
 
+from bones.kernel.explaining import ErrSite
 from bones.core.structs import GroupingError
 
 from bones.lang.lex import Token, L_ANGLE_COLON, L_PAREN, L_BRACKET, L_BRACE, R_ANGLE, R_PAREN, R_BRACKET, \
@@ -233,7 +234,10 @@ def determineGrouping(tokens):
                 if isinstance(wanted, str):
                     # TODO identify location of both opener and closer and maybe also print the relevant lines of source?
                     got = prettyNameByTag[token.tag]
-                    raise GroupingError('Wanted %s got %s - %s' % (wanted, got, token))
+                    raise GroupingError(
+                        'Wanted %s got %s - %s' % (wanted, got, token),
+                        ErrSite("wanted got")
+                    )
                 caught = True
             if isOpener:
                 for catcher in openingCatchers:
@@ -242,7 +246,10 @@ def determineGrouping(tokens):
                         currentTG = caught
                         break
         if not caught:
-            raise GroupingError('Unhandled token %s' % str(token))
+            raise GroupingError(
+                'Unhandled token %s' % str(token),
+                ErrSite("Unhandled token")
+            )
 
         # pop groups off the stack that have finished consuming tokens
         while not currentTG._consuming:
@@ -311,7 +318,10 @@ class _Tokens(object):
             # check we are NOT at start of expr
             if not self._phrase:
                 msg = f'{tokenOrGroup.src} (AssignRight) is not allowed at start of expression'
-                raise GroupingError(msg)
+                raise GroupingError(
+                    msg,
+                    ErrSite(self.__class__, "assign right")
+                )
             self._phrase.append(tokenOrGroup)
 
         else:
@@ -755,9 +765,15 @@ class SnippetGroup(_DotSepPhrases):
         self._finishPhrase(Missing, SECTION_END)
         super()._finalise()
     def _commaEncountered(self):
-        raise GroupingError("COMMA not valid in snippet")
+        raise GroupingError(
+            'COMMA not valid in snippet',
+            ErrSite(self.__class__, 'COMMA not valid in snippet')
+        )
     def _semicolonEncountered(self):
-        raise GroupingError("SEMI_COLON not valid in snippet")
+        raise GroupingError(
+            'SEMI_COLON not valid in snippet',
+            ErrSite(self.__class__, 'SEMI_COLON not valid in snippet')
+        )
 
 
 
@@ -884,15 +900,27 @@ class _ParamsTokens(_CommaSepPhrases):
         phrase = self._phrase
         for token in phrase:
             if not isinstance(token, Token):
-                raise GroupingError(f'Parameter must be a name - got {token} - handle in _consumeToken')
+                raise GroupingError(
+                    f'Parameter must be a name - got {token} - handle in _consumeToken',
+                    ErrSite(self.__class__, "Param must be a name")
+                )
         if len(phrase) == 0:
-            raise GroupingError(f'{{[] has no arguments @{self.l1}:{self.c1}')
+            raise GroupingError(
+                f'{{[] has no arguments @{self.l1}:{self.c1}',
+                ErrSite(self.__class__, "no args")
+            )
         elif len(phrase) == 1:
             firstToken = phrase[0]
             if firstToken.tag == ASSIGN_LEFT:
-                raise GroupingError(f'{{[... {firstToken.src} is missing type @{self.l1}:{self.c1}')
+                raise GroupingError(
+                    f'{{[... {firstToken.src} is missing type @{self.l1}:{self.c1}',
+                    ErrSite(self.__class__, "missing type")
+                )
             elif firstToken.tag != NAME:
-                raise GroupingError(f'{{[... contains {firstToken.src} which is not a name @{self.l1}:{self.c1}')
+                raise GroupingError(
+                    f'{{[... contains {firstToken.src} which is not a name @{self.l1}:{self.c1}',
+                    ErrSite(self.__class__, "not a name")
+                )
             phrase2 = [ParamGroup(self, firstToken, [])]
         else:
             firstToken = phrase[0]
@@ -919,11 +947,17 @@ class _ParamsTokens(_CommaSepPhrases):
     def _finalise(self):
         assert self._consuming
         if len(self._commaList) == 0:
-            raise GroupingError("No parameters in list")
+            raise GroupingError(
+                'No parameters in list',
+                ErrSite(self.__class__, 'No parameters in list')
+            )
         for phrase in self._commaList:
             # [a :int, b] is max allowed (i.e. 2 tokens - a name and a type)
             if phrase is not Missing and (len(phrase) < 1 or len(phrase) > 3):
-                raise GroupingError("Parameters can only be one assigment expression each or a name")
+                raise GroupingError(
+                    'Parameters can only be one assigment expression each or a name',
+                    ErrSite(self.__class__, 'only one assigment')
+                )
         super()._finalise()
         
     # @property
@@ -1093,7 +1127,10 @@ class _KeywordCatcher(_CommaSepPhrases):
                 self._latestToken = tokenOrGroup
             elif tokenOrGroup.tag == ASSIGN_RIGHT:
                 if not self._phrase:
-                    raise GroupingError('AssignRight not only allowed at start of expression - %s')
+                    raise GroupingError(
+                        'AssignRight not only allowed at start of expression - %s',
+                        ErrSite(self.__class__, 'AssignRight')
+                    )
                 self._phrase.append(tokenOrGroup)
             else:
                 if self._phraseIndent is Missing: self._phraseIndent = indent
@@ -1222,9 +1259,15 @@ class RequiresGroup(_CommaSepPhrases):
     def _finalise(self):
         if self._phrase: self._finishPhrase(Missing, SECTION_END)
         if len(self._commaList) == 0:
-            raise GroupingError(f'requires - no items specified - needs better error msg')
+            raise GroupingError(
+                f'requires - no items specified - needs better error msg',
+                ErrSite(self.__class__, 'requires - no items specified')
+            )
         if self._awaitingTokensPostComma:
-            raise GroupingError(f'requires - missing items after last comma - needs better error msg')
+            raise GroupingError(
+                f'requires - missing items after last comma - needs better error msg',
+                ErrSite(self.__class__, 'requires - missing items after last comma')
+            )
         super()._finalise()
 
     @property
@@ -1241,7 +1284,10 @@ class RequiresGroup(_CommaSepPhrases):
             self._phraseEndCause = NOT_ENDING
 
         if not isinstance(tokenOrGroup, Token):
-            raise GroupingError("No groups allowed in requires - better error msg needed")
+            raise GroupingError(
+                'No groups allowed in requires - better error msg needed',
+                ErrSite(self.__class__, 'No groups allowed in requires')
+            )
         
         elif tokenOrGroup.tag in (LINE_COMMENT, C_COMMENT, SECTION):
             pass
@@ -1261,10 +1307,16 @@ class RequiresGroup(_CommaSepPhrases):
                 self._startNewPhrase()
                 self._awaitingTokensPostComma = True
             else:
-                raise GroupingError(f"Encountered COMMA without a NAME - better error msg needed")
+                raise GroupingError(
+                    f'Encountered COMMA without a NAME - better error msg needed',
+                    ErrSite(self.__class__, 'No groups allowed in requires')
+                )
 
         elif tokenOrGroup.tag in (SEMI_COLON, NAME_COLON, ASSIGN_RIGHT):
-            raise GroupingError(f"{prettyNameByTag(tokenOrGroup.tag)} not allowed in requires - better error msg needed")
+            raise GroupingError(
+                f'{prettyNameByTag(tokenOrGroup.tag)} not allowed in requires - better error msg needed',
+                ErrSite(self.__class__, 'No groups allowed in requires')
+            )
 
         else:
             self._phrase.append(tokenOrGroup)
@@ -1530,8 +1582,3 @@ def pairwise(iterable):
     return zip(a, b)
 
 
-def _classAndMethodFor(obj):
-    frame = inspect.currentframe()
-    if frame.f_code.co_name == '_classAndMethodFor':
-        frame = frame.f_back
-    return f'{obj.__class__.__name__}.{frame.f_code.co_name}'

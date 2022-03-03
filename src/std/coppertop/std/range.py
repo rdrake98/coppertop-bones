@@ -22,10 +22,10 @@ import sys, types
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
-from typing import Any, Union
 from coppertop.pipe import *
 from coppertop.core import Null, NotYetImplemented
-from bones.core.types import pyint, pylist
+from bones.libs.range.core import IInputRange, IForwardRange, IOutputRange, IRandomAccessInfinite, getIRIter
+from bones.core.types import pylist
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - imports done')
 
@@ -39,132 +39,6 @@ if not hasattr(sys, '_EMPTY'):
             return 'EMPTY'
     sys._EMPTY = _EMPTY()
 EMPTY = sys._EMPTY
-
-
-# google
-# range n.
-# 2. a set of different things of the same general type.
-#     "the area offers a wide range of activities for the tourist"
-#
-# AHD
-# range n.
-# 9. A group or series of things extending in a line or row, especially a row or chain of mountains.
-# range v.intr.
-# 1. To vary within specified limits: sizes that range from small to extra large.
-# 2. To extend in a particular direction: a river that ranges to the east.
-# 4.
-#   a. To move through, along, or around in an area or region: Raiders ranged up and down the coast.
-#   b. To wander freely; roam: allowed the animals to range freely.
-# v.tr.
-# 1. To arrange or dispose in a particular order, especially in rows or lines: "In the front seats of the galleries were ranged the ladies of the court" (Carolly Erickson).
-# 2. To assign to a particular category; classify: Her works are often ranged under the headings Mystery and Science Fiction.
-# 3. To move through or along or around in (an area or region): The scouts ranged the mountain forests. The patrol boat ranged the coast.
-# 4. To look over or throughout (something): His eyes ranged the room, looking for the letter.
-#
-# cambridge
-# range n
-# a set of similar things:
-# I offered her a range of options.
-# There is a wide/whole range of opinions on this issue.
-
-
-# d style ranges
-# http://www.informit.com/articles/printerfriendly/1407357 - Andrei Alexandrescu
-# https://www.drdobbs.com/architecture-and-design/component-programming-in-d/240008321 - Walter Bright
-
-# empty - checks for end-of-input and fills a one-element buffer held inside the range object
-# front - returns the buffer
-# popFront() - sets an internal flag that tells empty to read the next element when called
-# moveFront() - moves to the start
-
-
-class IInputRange(object):
-    @property
-    def empty(self) -> bool:
-        raise NotImplementedError()
-    @property
-    def front(self):
-        raise NotImplementedError()
-    def popFront(self) -> None:
-        raise NotImplementedError()
-    def moveFront(self):
-        raise NotImplementedError()
-
-    # assignable
-    @front.setter
-    def front(self, value: Any) -> None:
-        raise NotImplementedError()
-
-    # python iterator interface - so we can use ranges in list comprehensions and for loops!!! ugh
-    # this is convenient but possibly too convenient and it may muddy things hence the ugly name
-    @property
-    def _getIRIter(self):
-        return IInputRange._Iter(self)
-
-    class _Iter(object):
-        def __init__(self, r):
-            self.r = r
-        def __iter__(self) -> IInputRange:
-            return self
-        def __next__(self):
-            if self.r.empty: raise StopIteration
-            answer = self.r.front
-            self.r.popFront()
-            return answer
-
-@coppertop
-def getIRIter(r):
-    # the name is deliberately semi-ugly to discourage but not prevent usage - see comment above
-    return r._getIRIter
-
-
-class IForwardRange(IInputRange):
-    def save(self) -> IForwardRange:
-        raise NotImplementedError()
-
-
-class IBidirectionalRange(IForwardRange):
-    @property
-    def back(self):
-        raise NotImplementedError()
-    def moveBack(self):
-        raise NotImplementedError()
-    def popBack(self) -> None:
-        raise NotImplementedError()
-
-    # assignable
-    @back.setter
-    def back(self, value: Any) -> None:
-        raise NotImplementedError()
-
-
-class IRandomAccessFinite(IBidirectionalRange):
-    def moveAt(self, i: int):
-        raise NotImplementedError()
-    def __getitem__(self, i: Union[int, slice]) -> Union[Any, IRandomAccessFinite]:
-        raise NotImplementedError()
-    @property
-    def length(self) -> pyint:
-        raise NotImplementedError()
-
-    # assignable
-    def __setitem__(self, i: int, value: Any) -> None:
-        raise NotImplementedError()
-
-
-class IRandomAccessInfinite(IForwardRange):
-    def moveAt(self, i: int):
-        raise NotImplementedError()
-
-    def __getitem__(self, i: int):
-        """Answers an element"""
-        raise NotImplementedError()
-
-
-class IOutputRange(object):
-    def put(self, value: Any):
-        """Answers void"""
-        raise NotImplementedError()
 
 
 @coppertop

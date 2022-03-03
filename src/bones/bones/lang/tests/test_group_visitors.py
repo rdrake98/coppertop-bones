@@ -23,7 +23,7 @@ from bones.lang import group
 from bones.lang.group import determineGrouping, SnippetGroup, DepthFirstTGVisitor
 from bones.lang.types import noun, unary
 from coppertop.std import count
-from bones.lang.sym import SymTable
+from bones.core.sym import SymTable
 
 
 

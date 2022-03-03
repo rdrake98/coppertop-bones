@@ -17,13 +17,15 @@
 # **********************************************************************************************************************
 
 
-from bones.lang.explaining import descriptionByLocationId
+from bones.kernel.explaining import docsByErrId
 
 class BonesError(Exception):
-    def __init__(self, msg, locationId):
+    def __init__(self, msg, errSite):
         super().__init__(msg)
-        self._locationId = locationId
-        assert locationId in descriptionByLocationId
+        self._errSite = errSite
+        if errSite.id not in docsByErrId:
+            print(repr(errSite.id))
+            raise NotImplementedError()
 
 class GroupingError(BonesError): pass
 
@@ -42,3 +44,6 @@ class SrcPtr(object):
 
 
 # coppertop piping etc should use this framework too - hence it lives in core not lang
+
+
+

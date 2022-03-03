@@ -150,8 +150,8 @@ Some sequences are also reserved, i.e. //, <:..>, {...}, {[...]...}, ([...]...)
 
 #### including other code
 ```
-load bones.std                              // loads a module into the kernel
-from bones.std import each, print           // adds the name each and print to this module's scope
+requires bones.std                          // loads a module into the kernel
+from bones.std use each, print           // adds the name each and print to this module's scope
 ```
 
 <br>
@@ -159,9 +159,9 @@ from bones.std import each, print           // adds the name each and print to t
 #### scopes
 ```
 _.contextVar
-__.aGlobalVar
-___.aClosureVarFromMyParentScopeActuallyImplementedAsAPartial
-___..aClosureVarFromMyParentParentsScopeActuallyImplementedAsAPartial
+_..aGlobalVar
+__.aClosureVarFromMyParentScopeActuallyImplementedAsAPartial
+__..aClosureVarFromMyParentParentsScopeActuallyImplementedAsAPartial
 ```
 
 <br>

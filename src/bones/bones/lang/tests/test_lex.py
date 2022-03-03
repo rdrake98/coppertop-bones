@@ -20,7 +20,7 @@ from glob import glob
 
 from coppertop.core import *
 from bones.lang import lex
-from bones.lang.sym import SymTable
+from bones.core.sym import SymTable
 
 
 def test_lex_bones_files():

@@ -1,6 +1,6 @@
 # **********************************************************************************************************************
 #
-#                             Copyright (c) 2017-2021 David Briant. All rights reserved.
+#                             Copyright (c) 2019-2022 David Briant. All rights reserved.
 #
 # This file is part of bones.
 #
@@ -16,19 +16,28 @@
 #
 # **********************************************************************************************************************
 
-from coppertop.pipe import *
-from coppertop.std import each, interleave
+
+from coppertop.core import Missing
+from coppertop.std import check, equal
+from bones.kernel.explaining import ErrSite
+from bones.kernel.tests.fred import Fred, fred
 
 
-# print(items >> sig)
 
-@coppertop
-def formatStruct(s, name, keysFormat, valuesFormat, sep):
-    def formatKv(kv):
-        k,v = kv
-        k = k if isinstance(k, str) else format(k, keysFormat)
-        v = v if isinstance(v, str) else format(v, valuesFormat)
-        return f'{k}={v}'
-    return f'{name}({list(s._nvs()) >> each >> formatKv >> interleave >> sep})'
-    # return f'{name}({s >> nvs >> each >> formatKv >> join >> sep})'
+def test_site():
+    f = Fred()
+    repr(f.site1) >> check >> equal >> 'bones.kernel.tests.fred.Fred>>__init__'
+    repr(f.site2) >> check >> equal >> 'bones.kernel.tests.fred.Fred>>__init__[#1]'
 
+    site = ErrSite()
+    repr(site) >> check >> equal >> '__main__>>test_site'
+
+
+
+def main():
+    test_site()
+    print("pass")
+
+
+if __name__ == '__main__':
+    main()

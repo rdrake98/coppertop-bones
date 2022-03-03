@@ -31,7 +31,7 @@ from bones.core.tests import test_polymorphic
 from bones.lang.tests import test_lex
 from bones.lang.tests import test_group
 from bones.lang.tests import test_group_visitors
-from bones.lang.tests import test_sym
+from bones.core.tests import test_sym
 
 
 

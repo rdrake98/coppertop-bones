@@ -16,7 +16,7 @@
 #
 # **********************************************************************************************************************
 
-from bones.core.syms import SymTable
+from bones.core.sym import SymTable
 
 
 def test():

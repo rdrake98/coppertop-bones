@@ -1,6 +1,6 @@
 # **********************************************************************************************************************
 #
-#                             Copyright (c) 2017-2021 David Briant. All rights reserved.
+#                             Copyright (c) 2019-2022 David Briant. All rights reserved.
 #
 # This file is part of bones.
 #
@@ -16,19 +16,12 @@
 #
 # **********************************************************************************************************************
 
-from coppertop.pipe import *
-from coppertop.std import each, interleave
+from bones.kernel.explaining import ErrSite
 
+class Fred(object):
+    def __init__(self):
+        self.site1 = ErrSite(self.__class__)
+        self.site2 = ErrSite(self.__class__, "#1")
 
-# print(items >> sig)
-
-@coppertop
-def formatStruct(s, name, keysFormat, valuesFormat, sep):
-    def formatKv(kv):
-        k,v = kv
-        k = k if isinstance(k, str) else format(k, keysFormat)
-        v = v if isinstance(v, str) else format(v, valuesFormat)
-        return f'{k}={v}'
-    return f'{name}({list(s._nvs()) >> each >> formatKv >> interleave >> sep})'
-    # return f'{name}({s >> nvs >> each >> formatKv >> join >> sep})'
-
+def fred():
+    return ErrSite("#1")

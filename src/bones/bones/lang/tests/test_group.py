@@ -23,9 +23,9 @@ from coppertop.testing import assertRaises
 from coppertop.std import assertEquals
 
 from bones.lang import lex
-from bones.lang.core import GroupingError
+from bones.core.structs import GroupingError
 from bones.lang.group import determineGrouping
-from bones.lang.sym import SymTable
+from bones.core.sym import SymTable
 
 
 # TODO
@@ -43,7 +43,7 @@ def main():
     test_current()
     test_errors()
     test()
-    test_group_bones_files()
+    # test_group_bones_files()
     print("pass")
 
 
