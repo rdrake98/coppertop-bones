@@ -24,7 +24,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from coppertop.core import Null, NotYetImplemented
-from bones.libs.range.core import IInputRange, IForwardRange, IOutputRange, IRandomAccessInfinite, getIRIter
+from bones.libs.on_demand.range import IInputRange, IForwardRange, IOutputRange, IRandomAccessInfinite, getIRIter
 from bones.core.types import pylist
 
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__ + ' - imports done')
