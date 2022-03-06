@@ -2,7 +2,7 @@
 #
 #                             Copyright (c) 2019-2021 David Briant. All rights reserved.
 #
-# This file is part of bones.
+# This file is part of coppertop-bones.
 #
 # bones is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
 # License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any
@@ -44,8 +44,8 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 import inspect
 from coppertop.core import Missing, ProgrammerError, NotYetImplemented
 from coppertop.pipe import coppertop
-from coppertop.std.range import IForwardRange
 
+from bones.libs.on_demand.range import IForwardRange
 from bones.kernel.explaining import ErrSite
 from bones.core.structs import GroupingError
 

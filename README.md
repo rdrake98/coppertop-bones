@@ -1,4 +1,4 @@
-## coppertop - some batteries Python didn't come with
+## coppertop-bones - some batteries Python didn't come with
 
 coppertop provides some minor batteries that Python didn't come with, a couple of error types, some module utils, 
 and sentinals for missing, null, tbc, void, etc, but its main purpose is to provide a bones-style aggregation 
