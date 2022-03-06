@@ -1,15 +1,18 @@
-## coppertop-bones - some batteries Python didn't come with
+## coppertop - some batteries Python didn't come with
 
-coppertop provides some minor batteries that Python didn't come with, a couple of error types, some module utils, 
-and sentinals for missing, null, tbc, void, etc, but its main purpose is to provide a bones-style aggregation 
+(This readme covers _coppertop_,  for _bones_ see [here](https://github.com/DangerMouseB/coppertop-bones/blob/main/src/bones/README.md)
+)
+
+As well as some minor batteries that Python didn't come with (a couple of error types, module utils, 
+and sentinals for missing, null, tbc, void, etc), coppertop provides a bones-style aggregation 
 manipulation experience via the following:
 
 * partial functions
 * piping syntax
 * multiple-dispatch
 * templated algebraic types
-* std library of protocols for basic types and manipulating them in aggregate
-* immutable structs
+* [a std library](https://github.com/DangerMouseB/examples/tree/main/src/std/coppertop) of protocols
+* immutable updates
 * contextual scope
 
 
@@ -167,8 +170,8 @@ I(domestic=ccy&T, foreign=ccy&T)  # named intersection (aka discrimated type)
 ```
 
 
-### Example
+### Example - Cluedo notepad
 
-See [algos.py](https://github.com/DangerMouseB/coppertop/blob/master/src/dm/dm/examples/cluedo/algos.py), where 
-we track a game of Cluedo and make inferences for who did it. See [games.py](https://github.com/DangerMouseB/coppertop/blob/master/src/dm/dm/examples/cluedo/games.py) 
+See [algos.py](https://github.com/DangerMouseB/examples/blob/main/src/dm/dm/examples/cluedo/algos.py), where 
+we track a game of Cluedo and make inferences for who did it. See [games.py](https://github.com/DangerMouseB/examples/blob/main/src/dm/dm/examples/cluedo/games.py) 
 for example game input.
