@@ -160,8 +160,8 @@ from bones.std use each, print           // adds the name each and print to this
 ```
 _.contextVar
 _..aGlobalVar
-__.aClosureVarFromMyParentScopeActuallyImplementedAsAPartial
-__..aClosureVarFromMyParentParentsScopeActuallyImplementedAsAPartial
+__.aClosureVarFromMyParentsScopeActuallyImplementedAsAPartial
+__..aClosureVarFromMyParentsParentsScopeActuallyImplementedAsAPartial
 ```
 
 <br>

@@ -342,7 +342,7 @@ def test():
         //from std_bones.bones.stdio uses stdout, stderr
         requires 
             my_first_bones.conversions, 
-            constants             // constants added to stretch the rquires parsing
+            constants             // constants added to stretch the requires parsing
 
         stdout "Hello " "world!"
         a: 1

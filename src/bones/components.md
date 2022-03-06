@@ -31,3 +31,9 @@ bones.core.types - standard types
 
 bones.core.structs
 
+coppertop.core
+
+coppertop.pipe
+
+
+
