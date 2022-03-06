@@ -1,1 +1,0 @@
-(players >> drop >> (iTurn | count))
