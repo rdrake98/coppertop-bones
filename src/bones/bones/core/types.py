@@ -16,6 +16,9 @@
 #
 # **********************************************************************************************************************
 
+# These types can be used in bones programs
+
+
 import sys
 if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
@@ -289,6 +292,17 @@ __all__ += [
     'ascii', 'utf8', 'sym', 'bool', 'pair',
 ]
 
+
+# piping styles
+noun = _BTAtom.ensure("noun")
+nullary = _BTAtom.ensure("nullary")
+unary = _BTAtom.ensure("unary")
+binary = _BTAtom.ensure("binary")
+ternary = _BTAtom.ensure("ternary")
+rau = _BTAtom.ensure("rau")
+__all__ += [
+    'noun', 'nullary', 'unary', 'binary', 'ternary', 'rau',
+]
 
 
 # could make +, -, / and * be type aware (index, offset, count should be orthogonal as well as exclusive)

@@ -49,7 +49,7 @@ class ErrSite(object):
             else:
                 self._label = args[0]
         elif len(args) == 2:
-            # id and class
+            # class, id
             if isinstance(args[0], classType):
                 self._className = args[0].__name__
                 self._label = args[1]

@@ -115,7 +115,7 @@ def testBTFn():
 def testStructCreation():
     label = BTAtom.ensure('label').setConstructor(tvstruct)
     title = label(text='My cool Tufte-compliant scatter graph')
-    title._names() == ['text']
+    title._keys() == ['text']
 
 
 def test_hasT():

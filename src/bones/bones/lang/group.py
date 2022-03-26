@@ -68,7 +68,7 @@ MIN_INDENT_FOR_REQUIRES = 2
 DEPTH_FIRST = 1
 BREADTH_FIRST = 2
 
-from bones.lang.types import nullary, binary, rau, ternary, unary, noun
+# from bones.core.types import nullary, binary, rau, ternary, unary, noun
 
 
 

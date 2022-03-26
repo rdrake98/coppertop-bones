@@ -23,14 +23,9 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from bones.core.metatypes import BTAtom as _BTAtom
 
 
+# These types are for the language to use and not for the user
 
-# piping styles
-noun = _BTAtom.ensure("noun")
-nullary = _BTAtom.ensure("nullary")
-unary = _BTAtom.ensure("unary")
-binary = _BTAtom.ensure("binary")
-ternary = _BTAtom.ensure("ternary")
-rau = _BTAtom.ensure("rau")
+
 
 
 # _BTAtom.define('imlist')        # immediate list, e.g. (1,2,3)
@@ -43,12 +38,6 @@ rau = _BTAtom.ensure("rau")
 # _BTAtom.define('PyFn')
 #
 # _BTAtom.define('null')
-#
-# _BTAtom('index')
-# _BTAtom('offset')
-# _BTAtom('num')
-# _BTAtom('count')
-#
-# _BTAtom.define('vector')
-# _BTAtom.define('matrix')
-# _BTAtom.define('tensor')
+
+
+

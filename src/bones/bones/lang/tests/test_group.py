@@ -194,7 +194,7 @@ def test():
     pp >> assertEquals >> '{[n o] o [n o] {:a} {:a}}. n [] t {:a}. l t {:x} t {:y} o l {:z}. {[n:t, n:t] o n t} {:fred}'
 
 
-    # names, assignment, type tagging, module scope, comments, continuation, blank lines, \n and ;
+    # keys, assignment, type tagging, module scope, comments, continuation, blank lines, \n and ;
     src = r'''
         a: 2 // a comment
 

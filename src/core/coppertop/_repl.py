@@ -54,10 +54,6 @@ def _printRepr(x):
     print(repr(x))
 RR = _callFReturnX(_printRepr, 'RR')
 
-def _printStr(x):
-    print(str(x))
-PP = _callFReturnX(_printStr, 'PP')
-
 def _printDir(x):
     print(dir(x))
 DD = _callFReturnX(_printDir, 'DD')
