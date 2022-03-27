@@ -24,7 +24,6 @@
 
 
 import inspect
-# from bones.kernel.explaining import docsByErrId
 from coppertop.core import Missing
 
 classType = type(object)

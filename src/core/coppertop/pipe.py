@@ -29,6 +29,7 @@ import inspect, types, builtins, datetime
 from collections import namedtuple
 from coppertop.core import ProgrammerError, NotYetImplemented, Missing, TBC, context
 from coppertop._singletons import _Proxy
+from bones.kernel.explaining import ErrSite
 from bones.core.metatypes import BType, fitsWithin, cacheAndUpdate, BTFn, BTUnion, BTTuple
 from bones.core.types import pystr, pyint, pylist, pydict, pytuple, pydate, pydatetime, pyset, pyfloat, pybool, \
     pydict_keys, pydict_items, pydict_values, pyfunc
@@ -472,12 +473,27 @@ class Partial(object):
                 newArgs = _atPut(p.args, p.iTBC[0:1], [arg])
             elif isinstance(p, binary):
                 if not p.isPiping: raiseLessPipe(SyntaxError(f'syntax not of form {_prettyForm(p.__class__)}'))
+                if isinstance(arg, MultiFn) and arg.dispatcher.style is rau:
+                    raiseLessPipe(NotYetImplemented(
+                        f'>> binary >> rau >> x not yet implemented use parentheses >> binary >> (rau >> x)',
+                        ErrSite(p.__class__, '>> binary >> rau >> x nyi')
+                    ))
                 newArgs = _atPut(p.args, p.iTBC[0:1], [arg])
             elif isinstance(p, ternary):
                 if not p.isPiping: raiseLessPipe(SyntaxError(f'syntax not of form {_prettyForm(p.__class__)}'))
                 if len(p.iTBC) == 2:
+                    if isinstance(arg, MultiFn) and arg.dispatcher.style is rau:
+                        raiseLessPipe(NotYetImplemented(
+                            f'>> ternary >> rau >> x >> y not yet implemented use parentheses >> ternary >> (rau >> x) >> y',
+                            ErrSite(p.__class__, '>> ternary >> rau >> x >> y nyi')
+                        ))
                     newArgs = _atPut(p.args, p.iTBC[0:2], [arg, TBC])
                 elif len(p.iTBC) == 1:
+                    if isinstance(arg, MultiFn) and arg.dispatcher.style is rau:
+                        raiseLessPipe(NotYetImplemented(
+                            f'>> ternary >> x >> rau >> y not yet implemented use parentheses >> ternary >> x >> (rau >> y)',
+                        ErrSite(p.__class__, '>> ternary >> x >> rau >> y nyi')
+                        ))
                     newArgs = _atPut(p.args, p.iTBC[0:1], [arg])
                 else:
                     raiseLessPipe(ProgrammerError())

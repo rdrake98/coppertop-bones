@@ -22,8 +22,10 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 
 from coppertop.pipe import *
+from coppertop.core import *
+from coppertop.testing import assertRaises
 from bones.core.metatypes import BTAtom
-from dm.std import check, equal, fitsWithin
+from dm.std import check, equal, fitsWithin, each
 from dm.std import tvarray
 from coppertop.tests.take1 import _take
 from coppertop.tests.take2 import _take
@@ -44,6 +46,11 @@ def test_mmul():
     b = tvarray(vec, [1, 2])
     res = a >> mmul >> b
     res >> check >> typeOf >> vec
+
+
+@coppertop(style=rau)
+def unpack(f):
+    return lambda xy: f(xy[0],xy[1])
 
 
 def testTake():
@@ -67,11 +74,20 @@ def testDoc():
     _take(pylist, pyint).d.__doc__ >> check >> equal >> 'hello'
     _take(pylist, pylist).d.__doc__ >> check >> equal >> 'there'
 
+
+def test_rau():
+    p1 = ((1, 1), (2, 2), (3, 3)) >> each
+    with assertRaises(NotYetImplemented):
+        res = p1 >> unpack >> (lambda x, y: x + y)
+        res >> check >> equal >> [2, 4, 6]
+
+
 def main():
     testTake()
     testTypeOf()
     testDoc()
     test_mmul()
+    test_rau()
 
 
 if __name__ == '__main__':
