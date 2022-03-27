@@ -23,8 +23,8 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from bones.core.metatypes import BTAtom
-from coppertop.std import check, equal, fitsWithin
-from coppertop.std import tvarray
+from dm.std import check, equal, fitsWithin
+from dm.std import tvarray
 from coppertop.tests.take1 import _take
 from coppertop.tests.take2 import _take
 from bones.core.types import pyint, pylist

@@ -18,7 +18,7 @@
 
 
 from coppertop.core import Missing
-from coppertop.std import check, equal
+from dm.std import check, equal
 from bones.kernel.explaining import ErrSite
 from bones.kernel.tests.fred import Fred, fred
 

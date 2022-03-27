@@ -19,8 +19,8 @@
 from coppertop.core import NotYetImplemented
 from coppertop.pipe import *
 from coppertop.pipe import selectDispatcher
-from coppertop.std.structs import tvseq
-from coppertop.std import check, equal, fitsWithin, doesNotFitWithin
+from dm.std.structs import tvseq
+from dm.std import check, equal, fitsWithin, doesNotFitWithin
 
 from bones.core.types import num, pystr, N, T1, T2, T3, T4, pyint, ascii
 from bones.core.metatypes import BTAtom, hasT, determineRetType

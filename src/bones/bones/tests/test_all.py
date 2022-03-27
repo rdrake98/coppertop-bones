@@ -54,6 +54,6 @@ if __name__ == '__main__':
     main()
     print('pass')
     from bones.core.metatypes import BType
-    from coppertop.std import count
+    from dm.std import count
     from coppertop.core import Missing
     print([t for t in BType._BTypeById if t is not Missing] >> count)

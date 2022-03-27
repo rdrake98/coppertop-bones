@@ -25,7 +25,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 from coppertop.pipe import *
 from coppertop.pipe import NO_TYPE
 from coppertop.testing import assertRaises
-from coppertop.std import check, each, tvseq
+from dm.std import check, each, tvseq
 from bones.core.types import pystr, pyint, N
 from bones.core.metatypes import BTTuple
 

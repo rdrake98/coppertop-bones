@@ -23,7 +23,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.core import Missing, ProgrammerError
 from coppertop.testing import assertRaises
-from coppertop.std import check, equal, each, to, joinAll, _, sortUsing, box, tvstruct
+from dm.std import check, equal, each, to, joinAll, _, sortUsing, box, tvstruct
 
 from bones.core.metatypes import BTAtom, BType, BTArray, BTMap, BTFn, S, isT
 from bones.core.types import Holder, index, count, offset, num, pystr, N, null, T, T1, T2, T3

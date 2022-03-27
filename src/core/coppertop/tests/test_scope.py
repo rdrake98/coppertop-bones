@@ -27,7 +27,7 @@ from ctypes import c_long
 from coppertop.core import *
 from coppertop.testing import assertRaises
 from coppertop._singletons import _Proxy, Scope
-from coppertop.std import check, equal, tvstruct
+from dm.std import check, equal, tvstruct, PP
 
 
 

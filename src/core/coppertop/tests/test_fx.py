@@ -27,8 +27,8 @@ from coppertop.pipe import *
 from coppertop.testing import assertRaises
 from bones.core.metatypes import S, fitsWithin as fullFitsWithin
 from bones.core.types import T1, T2, tvfloat
-from coppertop.std.types import ccy, fx
-from coppertop.std import check, fitsWithin
+from dm.std.types import ccy, fx
+from dm.std import check, fitsWithin
 
 
 

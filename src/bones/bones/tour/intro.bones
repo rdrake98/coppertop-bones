@@ -5,7 +5,7 @@
 */
 
 // we tell the kernel that we want to use functions defined in various libraries
-from coppertop.std use *   // "*" here means that every function in coppertop.std is made available for our use
+from dm.std use *   // "*" here means that every function in dm.std is made available for our use
 
 // we can also tell the kernel to include other libraries - this doens't make names available just adds functionality
 // to names we have said we want to use

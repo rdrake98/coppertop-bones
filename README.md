@@ -10,10 +10,10 @@ manipulation experience via the following:
 * partial functions
 * piping syntax
 * multiple-dispatch
-* templated algebraic types
-* [a std library](https://github.com/DangerMouseB/examples/tree/main/src/std/coppertop) of protocols
+* type system with nominal, union, product, exponential and intersection types and type variables
 * immutable updates
 * contextual scope
+* and a [standard library](https://github.com/DangerMouseB/examples/tree/main/src/dm/dm/std)
 
 
 <br>
@@ -55,7 +55,7 @@ top-to-bottom. The idea is to make it easy to express the syntax (aka sequence) 
 syntax: `A >> f(args)` -> `f(args)(A)`
 
 ```
-from coppertop.std import anon
+from dm.std import anon
 
 @coppertop
 def addOne(x):
@@ -75,7 +75,7 @@ syntax: `A >> f(args) >> B` -> `f(args)(A, B)`
 
 ```
 from coppertop.core import NotYetImplemented
-from coppertop.std import each, inject
+from dm.std import each, inject
 
 @coppertop(style=binary)
 def add(x, y):
@@ -101,7 +101,7 @@ def op(x, action, y):
 syntax: `A >> f(args) >> B >> C` -> `f(args)(A, B, C)`
 
 ```
-from coppertop.std import both, check, equal
+from dm.std import both, check, equal
 
 [1,2] >> both >> (lambda x, y: x + y) >> [3,4] >> check >> equal >> [4, 6]
 ```
@@ -150,7 +150,7 @@ def addOne(x):                 # fallback
 <br>
 
 
-### Templated algebraic type system
+### Templated type system
 
 As an introduction, consider:
 

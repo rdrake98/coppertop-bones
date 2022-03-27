@@ -16,13 +16,13 @@
 #
 # **********************************************************************************************************************
 
-from coppertop.std import assertEquals
+from dm.std import assertEquals
 
 from bones.lang import lex
 from bones.lang import group
 from bones.lang.group import determineGrouping, SnippetGroup, DepthFirstTGVisitor
 from bones.core.types import noun, unary
-from coppertop.std import count
+from dm.std import count
 from bones.core.sym import SymTable
 
 

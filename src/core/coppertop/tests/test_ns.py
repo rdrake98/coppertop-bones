@@ -24,7 +24,7 @@ if hasattr(sys, '_TRACE_IMPORTS') and sys._TRACE_IMPORTS: print(__name__)
 
 from coppertop.pipe import *
 from coppertop.testing import assertRaises
-from coppertop.std import check, equal
+from dm.std import check, equal
 from bones.core.types import pystr, pyfloat
 
 from coppertop.tests.adders import addOne, eachAddOne, eachAddTwo

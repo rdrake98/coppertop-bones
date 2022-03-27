@@ -18,16 +18,15 @@
 
 import random
 from coppertop.pipe import *
-from coppertop.core import PP
 from coppertop.testing import assertRaises
-from coppertop.std import check, equal, _v, to, drop, fitsWithin, doesNotFitWithin
-from coppertop.std.structs import tvarray, tvseq
+from dm.std import check, equal, _v, to, drop, fitsWithin, doesNotFitWithin, PP
+from dm.std.structs import tvarray, tvseq
 
 from bones.core.types import index, count, num, pystr, N, T, \
     T1, T2, T3, pyint, pyfloat, tv, anon, named, aliased, pylist
 from bones.core.metatypes import BTAtom, S, _partition, BType,weaken
-from coppertop.std.types import ccy, fx
-from coppertop.std.linalg import square, right
+from dm.std.types import ccy, fx
+from dm.std.linalg import square, right
 
 
 tFred = BTAtom.ensure('fred')
@@ -205,7 +204,8 @@ def testImplicit():
     A4 >> _v >> check >> equal >> A._v
 
     A = lmatrix([[1, 2], [3, 4]]) | +named
-    A._t >> PP >> check >> fitsWithin >> (lmatrix[T1] >> PP) >> PP
+    A._t >> check >> fitsWithin >> (lmatrix[T1])
+    # A._t >> PP >> check >> fitsWithin >> (lmatrix[T1] >> PP) >> PP
 
 
 def testOrthogonal():

@@ -34,16 +34,16 @@ from coppertop.tests import test_scope
 from coppertop.tests import test_fx
 
 # std tests
-from coppertop.std.tests import test_agg_us_yields
-from coppertop.std.tests import test_std
-from coppertop.std._linalg.tests import test_linealg_core
+from dm.std.tests import test_agg_us_yields
+from dm.std.tests import test_std
+from dm.std._linalg.tests import test_linealg_core
 
 # range tests
-from coppertop.std.tests import test_range
-from coppertop.std.examples.tests import test_count_lines_jsp
-from coppertop.std.examples.tests import test_format_calendar
-from coppertop.std.examples.tests import test_lazy_vs_eager
-from coppertop.std.examples.tests import test_misc as examples_test_misc
+from dm.std.tests import test_range
+from dm.std.examples.tests import test_count_lines_jsp
+from dm.std.examples.tests import test_format_calendar
+from dm.std.examples.tests import test_lazy_vs_eager
+from dm.std.examples.tests import test_misc as examples_test_misc
 
 # dm tests
 from dm.tests import test_all as dm_test_all
@@ -85,7 +85,7 @@ if __name__ == '__main__':
     main()
     print('pass')
     from bones.core.metatypes import BType
-    from coppertop.std import count
+    from dm.std import count
     from coppertop.core import Missing
     print([t for t in BType._BTypeById if t is not Missing] >> count)
 

@@ -17,7 +17,7 @@
 # **********************************************************************************************************************
 
 from coppertop.pipe import *
-from coppertop.std import check, equal, fitsWithin
+from dm.std import check, equal, fitsWithin
 
 from bones.core.types import index, count, num, pystr, N,  T, T1, T2, T3, pyint, pyfloat, pylist, pydict
 from bones.core.metatypes import BType, BTAtom, S, weaken, cacheAndUpdate, fitsWithin as _fitsWithin
@@ -54,7 +54,7 @@ def testSimple():
 
 
 def testNested():
-    from coppertop.std.types import ccy
+    from dm.std.types import ccy
     GBP = ccy['GBP']
     USD = ccy['USD']
     weaken((pyint, pyfloat, pyint, pyfloat), (ccy[T], GBP, USD))

@@ -20,7 +20,7 @@
 
 from coppertop.pipe import *
 from coppertop.testing import assertRaises
-from coppertop.std import _, check, equal
+from dm.std import _, check, equal
 
 
 def prettyArgs(*args):
