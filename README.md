@@ -22,7 +22,7 @@ manipulation experience via the following:
 
 By decorating a function with @coppertop (and importing _) we can easily create partial functions, for example:
 
-syntax: `f(_, a) -> f(_)`  \
+syntax: `f(_, a)` -> `f(_)`  \
 where `_` is used as a sentinel place-holder for arguments yet to be confirmed (TBC)
 
 ```
