@@ -10,10 +10,10 @@ manipulation experience via the following:
 * partial functions
 * piping syntax
 * multiple-dispatch
-* type system with nominal, union, product, exponential and intersection types and type variables
+* type system with nominal, intersection, union, product, and exponential types with type variables
 * immutable updates
 * contextual scope
-* and a [standard library](https://github.com/DangerMouseB/examples/tree/main/src/dm/dm/std)
+* and a embryonic [library](https://github.com/DangerMouseB/examples/tree/main/src/dm/dm/std) of common pipeable functions 
 
 
 <br>
@@ -50,7 +50,7 @@ top-to-bottom. The idea is to make it easy to express the syntax (aka sequence) 
 
 <br>
 
-#### unary - takes 1 piped argument and 0+ called arguments
+#### unary style - takes 1 piped argument and 0+ called arguments
 
 syntax: `A >> f(args)` -> `f(args)(A)`
 
@@ -69,7 +69,7 @@ def addOne(x):
 
 <br>
 
-#### binary - takes 2 piped argument and 0+ called arguments
+#### binary style - takes 2 piped argument and 0+ called arguments
 
 syntax: `A >> f(args) >> B` -> `f(args)(A, B)`
 
@@ -96,7 +96,7 @@ def op(x, action, y):
 
 <br>
 
-#### ternary - takes 3 piped argument and 0+ called arguments
+#### ternary style - takes 3 piped argument and 0+ called arguments
 
 syntax: `A >> f(args) >> B >> C` -> `f(args)(A, B, C)`
 
@@ -150,7 +150,7 @@ def addOne(x):                 # fallback
 <br>
 
 
-### Templated type system
+### Type system
 
 As an introduction, consider:
 
@@ -162,16 +162,75 @@ ccy = num & _ccy                # intersection
 ccy + null                      # union
 ccy * pyint * pystr             # tuple (sequence of types)
 S(name=pystr, age=num)          # struct
-N ** ccy                        # collection of ccy accessed by an ordinal
+N ** ccy                        # collection of ccy accessed by an ordinal (N)
 pystr ** ccy                    # collection of ccy accessed by a python string
 (num*num) ^ num                 # (num, num) -> num - a function
+T, T1, T2, ...                  # type variable - to be inferred at build time
 
 I(domestic=ccy&T, foreign=ccy&T)  # named intersection (aka discrimated type)
 ```
 
+<br>
 
 ### Example - Cluedo notepad
 
 See [algos.py](https://github.com/DangerMouseB/examples/blob/main/src/dm/dm/examples/cluedo/algos.py), where 
 we track a game of Cluedo and make inferences for who did it. See [games.py](https://github.com/DangerMouseB/examples/blob/main/src/dm/dm/examples/cluedo/games.py) 
 for example game input.
+
+<br>
+
+### Next
+
+#### example bones code working end to end
+
+For a suite of example .bones files:
+
+* lex -> tokens
+* group -> token groups + some markup
+* parse -> untyped / partially typed TC (Tree Code aka AST)
+* infer and check types -> typed TC (fully concrete and type templated - i.e. with type variables)
+* build & bind (rebind affected concrete TC) -> concrete TC
+* at this point a snippet will be runnable (assuming no type errors) - snippets are run on import and REPL / jupyter execution
+* functions in the kernel can be called from python via something like `x = kernel.module.fn(a,b,c)`
+
+
+#### determine how to do exception handling
+
+We can easily add a trap function that converts a signal into a error value however we want to be pluralistic with 
+implementation languages so may need a better sense of signal trapping at the TC or (hopefully not) langauge level.
+In the sorts of use cases that bones is intended ofr typically errors can be modelled as data and although one can 
+imagine that a far reaching escape (e.g. the ^ borrowed from Smalltalk) from the current path (e.g. over several 
+functions) could be useful it is not clear that there isn't an elegant alternative.
+
+
+#### collaborative / community developent / selection of a bones.std
+
+Currently dm.std contains bits and pieces of library style code but Jeff Atwood's [Rule Of Three](https://blog.codinghorror.com/rule-of-three/) 
+implies that more than one common / standard library will emerge for bones and that it will arise from a 
+joint focus and application into multiple use cases. Needless to say any bones.std should be as integrated and well 
+designed as Smalltalk-80's / VisualWorks.
+
+
+#### error messages
+
+These should be outstandingly good. Grouping helps. ErrSite should help. They should be built into the type inference 
+process too. The goal is that the error message should be enough for the program to instantly know how to fix the 
+problem and not to have to hunt around to understand the message.
+
+
+#### profiling
+
+There's a popular quote about premature optimisation. The deeper question is why do people favour  fast 
+code over clear code (asuuming they could write well and are not in a rush) when then code in question is not on the 
+critical path? A couple of answers come to mind - the thrill of speed and an anxiety of not being fast enough. To
+help bones programmers avoid this trap, we should have first class profiling - aggregated time within a scope as well 
+as stopwatch style end to end aggregated time. I'm with Paul Graham on this one.
+
+<br>
+
+### Later
+
+* Convert TC to Byte Code (BC), Internal Representation (IR) for a compiler (e.g. (MIR)[https://github.com/vnmakarov/mir/]
+or possibly QBE, LLVM, etc) and / or Machine Code (MC).
+
