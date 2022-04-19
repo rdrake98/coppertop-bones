@@ -857,6 +857,8 @@ def _fnContext(fn, callerFnName, newName=Missing):
         frame = frame.f_back
     if frame.f_code.co_name == 'coppertop':  # depending on how coppertop was called this may or may not exist
         frame = frame.f_back
+    if frame.f_code.co_name == '__ror__':  # e.g. (lambda...) | (T1^T2)
+        frame = frame.f_back
     priorDef = frame.f_locals.get(fnname, Missing)
     if priorDef is Missing:
         priorDef = frame.f_globals.get(fnname, Missing)
@@ -907,9 +909,9 @@ def selectDispatcher(mfOrD, argTypes):
 
 def anon(*args):
     if len(args) == 1:
-        name, _t, fn = '___', Missing, args[0]
+        name, _t, fn = '<lambda>', Missing, args[0]
     elif len(args) == 2:
-        name, _t, fn = '___', args[0], args[1]
+        name, _t, fn = '<lambda>', args[0], args[1]
     elif len(args) == 3:
         name, _t, fn = args[0], args[1], args[2]
     else:
