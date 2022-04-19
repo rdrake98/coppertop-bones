@@ -19,7 +19,7 @@
 
 from glob import glob
 from bones.kernel.the import kernel
-from dm.std import check, equal, first
+from dm.std import check, equal, first, count
 
 
 def test_addOne():
@@ -32,9 +32,20 @@ def test_addOne():
     2 >> kernel.addOne.addOne >> check >> equal >> 3   # public interface is as if it has been wrapped with @coppertop
 
 
+def test_partitions():
+    k = kernel()
+    pfn = glob('./bones/partitions.bones', recursive=True) >> first
+    with open(pfn) as f:
+        # get the kernel to build the source (pass as a stream or unicode string - could be from a db, file, repl etc)
+        answer = k.build(f)
+    answer >> check >> equal >> Void
+    range(6) >> kernel.partitions.partitions >> (3,2,1) >> count >> check >> equal >> 3
+
+
 
 def main():
     test_addOne()
+    test_partitions()
 
 
 if __name__ == '__main__':

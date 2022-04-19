@@ -16,7 +16,7 @@ kernel is a global singleton that stores
   - globals
   - context stack
   - handles
-- memory allocations
+- memory memory management for the BC and MC (and possibly for python data structures?)
 
 It is the interface between bones and all other processes. APIs include:
   - jupyter kernel,
@@ -25,6 +25,5 @@ It is the interface between bones and all other processes. APIs include:
   - python api
   - c api
   - debugging (VSCode and hopefully IntelliJ / PyCharm)
-
 
 
