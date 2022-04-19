@@ -54,7 +54,6 @@ def main():
     test_errors()
     test()
     # test_group_bones_files()
-    print("pass")
 
 
 def test_current():
@@ -381,3 +380,4 @@ def test_group_bones_files():
 
 if __name__ == '__main__':
     main()
+    print("pass")

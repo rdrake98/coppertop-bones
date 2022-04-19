@@ -1,6 +1,6 @@
 # **********************************************************************************************************************
 #
-#                             Copyright (c) 2019-2022 David Briant. All rights reserved.
+#                             Copyright (c) 2019-2021 David Briant. All rights reserved.
 #
 # This file is part of coppertop-bones.
 #
@@ -16,25 +16,25 @@
 #
 # **********************************************************************************************************************
 
+
 from glob import glob
-
-from coppertop.core import *
-from bones.lang import lex
-from bones.core.sym import SymTable
+from bones.kernel.the import kernel
+from dm.std import check, equal, first
 
 
-def test_lex_bones_files():
-    for pfn in glob('./bones/*.bones', recursive=True):
-        pfn >> PP
-        with open(pfn) as f:
-            src = f.read()
-        st = SymTable()
-        tokens, lines = lex.lexBonesSrc(src, st)
+def test_addOne():
+    k = kernel()
+    pfn = glob('./bones/addOne.bones', recursive=True) >> first
+    with open(pfn) as f:
+        # get the kernel to build the source (pass as a stream or unicode string - could be from a db, file, repl etc)
+        answer = k.build(f)
+    answer >> check >> equal >> 2
+    2 >> kernel.addOne.addOne >> check >> equal >> 3   # public interface is as if it has been wrapped with @coppertop
 
 
 
 def main():
-    test_lex_bones_files()
+    test_addOne()
 
 
 if __name__ == '__main__':

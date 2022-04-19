@@ -118,8 +118,8 @@ def test_depthFirstTokenRange():
 
 def main():
     test_depthFirstTokenRange()
-    print("pass")
 
 
 if __name__ == '__main__':
     main()
+    print("pass")
