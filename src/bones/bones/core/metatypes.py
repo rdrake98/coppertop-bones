@@ -31,6 +31,7 @@ __all__ = ['BType', 'S']
 
 import itertools, builtins
 from bones.core.utils import raiseLessPipe
+from bones.kernel.explaining import ErrSite
 from coppertop._singletons import context, Missing, ProgrammerError, NotYetImplemented, PathNotTested
 
 _verboseNames = False
@@ -139,7 +140,8 @@ class BType(object):
             # type has a coercer
             return self._coercer(self, instance)
         else:
-            raiseLessPipe(TypeError(f'{instance} can\'t be coerced to {self})'))
+            msg = f'{instance} can\'t be coerced to <:{self}> - instance has no _asT, type has no _coercer'
+            raiseLessPipe(TypeError(msg, ErrSite(self.__class__)))
 
 
     # INSTANCE CONSTRUCTION
