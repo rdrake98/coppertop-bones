@@ -206,7 +206,8 @@ functions) could be useful it is not clear that there isn't an elegant alternati
 
 #### collaborative / community developent / selection of a bones.std
 
-Currently dm.std contains bits and pieces of library style code but Jeff Atwood's [Rule Of Three](https://blog.codinghorror.com/rule-of-three/) 
+Currently dm.std contains bits and pieces of library style code but Jeff Atwood's [The Delusion of Reuse and the Rule of Three](https://blog.codinghorror.com/the-delusion-of-reuse/) 
+(also [Rule Of Three](https://blog.codinghorror.com/rule-of-three/))
 implies that more than one common / standard library will emerge for bones and that it will arise from a 
 joint focus and application into multiple use cases. Needless to say any bones.std should be as integrated and well 
 designed as Smalltalk-80's / VisualWorks.
